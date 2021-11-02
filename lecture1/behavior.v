@@ -121,11 +121,11 @@ reg sum, carry;
 
 always@(a or b)
 
-begin
+ begin
 
-sum = a^b;
+    sum = a^b;
 
-carry = a&b;
+    carry = a&b;
 
 end
 
