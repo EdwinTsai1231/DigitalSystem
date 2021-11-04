@@ -1,4 +1,3 @@
-
 module testbench;
     reg x,y,c_in;
     wire s,c;
@@ -88,7 +87,6 @@ module FA(x,y,c_in,sum,c_out);
 
     always@(x or y or c_in)
     begin
-        {c_out , sum } = x+y+c_in ; //{cout , sum} 當作兩個 bits 的組合 因此 x+y+c_in 的二進制就會分別有 c_out sum 的 bits
+        {c_out , sum } = x+y+c_in ; //{cout , sum} 當作兩個 bits
     end
 endmodule
-
