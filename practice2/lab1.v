@@ -165,7 +165,7 @@ module special_multiplier (num,result);
             sum = (num+1) << 1 ; 
             end
 
-        else if(num<=7)
+        else if(num<=4'd 7)
             begin 
             sum = (num-1) << 1 ;
             end
