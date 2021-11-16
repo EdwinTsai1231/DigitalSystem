@@ -1,0 +1,44 @@
+A module instannce must have a name 
+    ex:OR_AND_STRUCTURAL
+
+The use of an instance name with a privitive is optional 
+    or u1(TEMP[0],IN[0],IN[1])
+    or u2(TEMP[1],IN[2],IN[3])
+    and (OUT , TEMP[0],TEMP[1])
+
+Port Mapping has two ways :
+    1.In Order 
+    2.By name
+
+Numbers :
+    Numbers are integer or real constants . 
+    Interger constants are written as 
+    <size><base format><number>
+
+    Real number can be represented in decimal or scientific format
+
+    A number may be sized or unsized
+
+    The base format indicates the type of the number 
+        Decimal (d)
+        Hex (h)
+        Octal (o)
+        Binary (b)
+        example : 'h72ab(unsize number)
+                  16'h72ab(sized number)
+
+Verilog allows three kinds of descriptions for circuits:
+    (1)Structural description (2)Data flow description 
+    (3)Behavior description
+
+    (1)Structural description: directly tells the program what kind
+        of logic gates(module) you need .
+
+    (2)Data flow description: use assign to produce the real circuit diagram
+
+    (3)Behavior description : use always@(variable) to detect the variable changes
+        if the variable changes then do the following statements .
+        We can use the case(variabel) to describe the truth tables .
+
+
+
