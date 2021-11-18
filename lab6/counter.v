@@ -65,7 +65,9 @@ module counter(clock,reset,out) ; //top module
 
     always@(posedge div_clk or negedge reset)
     begin
-        if(reset) //reset=1
+        if(!reset)
+            temp = 0 ;
+        else 
             begin
 
             if(temp==4'd 15)
@@ -74,8 +76,6 @@ module counter(clock,reset,out) ; //top module
                 temp = temp + 1'b 1 ;
 
             end
-        else //reset=0
-            temp = 0 ;
     end 
     SevenDisplay u1 (.in(temp),.out(out)) ;
 
