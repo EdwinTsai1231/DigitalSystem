@@ -56,8 +56,6 @@ module MooreMachine (clock , reset , In, out) ;
                     ST3 = 3'd 3 ,
                     ST4 = 3'd 4 ,
                     ST5 = 3'd 5 ,
-                    ST6 = 3'd 6 ,
-                    ST7 = 3'd 7 ;
     reg [2:0] CurrentState , NextState , temp  ;
     
     clk_div c1 (.clk_in(clock),.reset(reset),.clk_out(div_clk)) ;
@@ -105,7 +103,7 @@ module MooreMachine (clock , reset , In, out) ;
             end
             ST5:begin
                 if(!In)
-                    NextState = ST6 ;
+                    NextState = ST0 ;
                 else
                     NextState = ST4 ; 
             end
