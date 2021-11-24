@@ -3,33 +3,20 @@
 ## Basic Declaration
 ```
 //範例
-module counter(clock,reset,out) ; //top module
-    input clock , reset ;
-    output[6:0] out ;
-    reg[3:0] temp ;
-    wire div_clk;
-    FrequencyDivider f1 (.clk(clock),.reset(reset),.div_clk(div_clk)) ;
+module Add_half (sum,c_out, a,b);
 
-    always@(posedge div_clk or negedge reset)
-    begin
-        if(!reset)
-            temp = 0 ;
-        else
-            begin
+    input a , b ;
+    output sum , c_out ;
+    wire c_out_bar;
 
-            if(temp==4'd 15)
-                temp = 4'b 0 ;
-            else
-                temp = temp + 1'b 1 ;
-
-            end
-    end
-    SevenDisplay u1 (.in(temp),.out(out)) ;
+    xor (sum , a , b);
+    nand (c_out_bar , a,b );
+    not(c_out,c_out_bar) ;
 
 endmodule
 ```
 ### module
-Verilog 起始宣告的關鍵字。後面的括弧裡面放 input,output 的腳位，
+Verilog Module 可以視為是 basic building block 。後面的括弧裡面放 input,output 的腳位，
 記得module那一行最後要加分號" ; "，
 
 同時記得最後一定要在結尾處加個**endmodule**。
@@ -105,9 +92,100 @@ module FA(x,y,c_in,sum,c_out);
     end
 endmodule
 ```
-Behavior 是用 reg ( Register ) 來表示電路，因此常跟 always 搭配使用。
+Behavior 是用 reg ( Register , but not necessarily FF ) 來表示電路
+，因此常跟 always 搭配使用。
+
+此外 Behavior 裡面的 always 裡面可以直接放個 truth table 來表示整個 
+circuit 的 behavior。
+```
+// Behavior Description with Truth Table inside .
+module SevenSegment(in,out);
+    input [3:0] in ;
+    output reg  [6:0] out ;
+
+    always@(in)
+    begin
+        case(in)
+        4'h 0 : out = 7'b 1000000;
+        4'h 1 : out = 7'b 1111001;
+        4'h 2 : out = 7'b 0100100;     
+        4'h 3 : out = 7'b 0110000;     
+        4'h 4 : out = 7'b 0011001;     
+        4'h 5 : out = 7'b 0010010;      
+        4'h 6 : out = 7'b 0000010;     
+        4'h 7 : out = 7'b 1111000;     
+        4'h 8 : out = 7'b 0000000;      
+        4'h 9 : out = 7'b 0010000;
+        4'h a : out = 7'b 0001000;
+        4'h b : out = 7'b 0000011;
+        4'h c : out = 7'b 1000110;
+        4'h d : out = 7'b 0100001;
+        4'h e : out = 7'b 0000110;
+        4'h f : out = 7'b 0001110;
+        endcase
+    end
+endmodule
+```
 ```
 個人想法：
 Structural Behavior 適用在 high-level。
 Data Flow & Behavior 適用在 low-level。
 ```
+
+---
+## Instance Name 
+A module must have a name .
+```
+//example
+or u1 (Temp[0] , IN[0] , IN[1]);
+or u2 (Temp[1] , IN[2] , IN[3]);
+and u3 (Out , Temp[0] , Temp[1]);
+```
++ or 以及 and 是 module 。
++ u1 , u2 , u3 是 instance name 。 
+
+### Port Mapping 
++ In Order : 按照原先 module 順序依序填入 intput , output 。
++ By Name : 可自行填整填入位置，但是要用 .portname(variable) 的
+形式來標注每一個 port 。
+
+---
+## Numbers 
+Numbers are integer or real constants . 
+
+Integer constants are written as
+```
+<size>'<base format><number> 
+```  
+### Base Format
+The base  format indicates the type of the number .
++ Decimal (d or D)
++ Hex (h or H)
++ Octol (o or O)
++ Binary (b or B)
+
+---
+## Parameterized Design 
+```
+module PARAM(A,B,C) ;
+    input [7:0] A,B ;
+    output [7:0] C ;
+    wire f ;
+    or o1 (f,A,B);
+    test #(4) u1 (A,f,C) ; //#() 可以用來調整 module 裡面的 parameter 變數。
+endmodule
+
+module test (a,b,c) ;
+    parameter width = 8 ; //default
+    input [width-1 : 0]a,b ;
+    output[width-1 : 0] c;
+
+    assign c = a & b ;
+
+endmodule
+```
+---
+## Expressions 
+### Verilog Operands
+
+### Verilog Operators
