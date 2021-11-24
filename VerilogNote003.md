@@ -29,13 +29,13 @@ module counter(clock,reset,out) ; //top module
 endmodule
 ```
 ### module
-Verilog起始宣告的關鍵字。後面的括弧裡面放input,output的腳位，
+Verilog 起始宣告的關鍵字。後面的括弧裡面放 input,output 的腳位，
 記得module那一行最後要加分號" ; "，
 
 同時記得最後一定要在結尾處加個**endmodule**。
 
 ### input , output
-負責輸入輸出腳位，可以跟module的wire合併。
+負責輸入輸出腳位，可以跟 module的 wire合併。
 + input : input 必須要為 wire，input 本身預設就為 wire，因此不必特別去改。
 + output : output 可以為 wire 或 reg ，預設為 wire ，若想宣告為 reg ，
 可輸入 output reg < 變數名稱 > ;
