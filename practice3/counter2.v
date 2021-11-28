@@ -60,31 +60,26 @@ module counter2(sel,reset,clock , out) ;
 
     FrequencyDivider f1 (.in_clk(clock),.reset(reset),.out_clk(div_clk)) ;
 
-    always@(posedge div_clk or negedge reset or sel)
+    always@(posedge div_clk or negedge reset)
     begin
-    if(sel)
-        begin
-            if(!reset)
-                temp  = 4'd 0 ;
-            else
-                begin
-                    if(temp==4'd 15)
-                        temp = 4'd 0 ;
-                    else
-                        temp = temp + 1'd 1 ;
-                end
-        end
+    if(!reset)
+        temp = 4'd 0 ;
     else
         begin
-            if(!reset)
-                temp  = 4'd 0 ;
+            if(sel)
+            begin
+                if(temp == 4'd 15)
+                    temp = 4'd 0 ;
+                else
+                    temp = temp + 1 ;
+            end
             else
-                begin
-                    if(temp==4'd 0)
-                        temp = 4'd 15 ;
-                    else
-                        temp = temp - 1'd 1 ;
-                end
+            begin
+                if(temp == 4'd 0)
+                    temp = 4'd 15 ;
+                else
+                    temp = temp -1 ;
+            end
         end
     end
     
