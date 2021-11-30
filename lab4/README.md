@@ -42,7 +42,7 @@ module encoder(in, valid, out);
 endmodule
 // 將 4 bits 的 data 轉換成 2 bits 。
 ```
- **Functional table :**
+ **Functiona table :**
 
 | in[3] | in[2] | in[1] | in[0] | valid | out[1] | out[0] |
 | ----  | ----  | ----  | ----  | ----  | ----   | -----  |
