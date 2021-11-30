@@ -21,7 +21,7 @@ module adder_subtractor(a, b, select, out, overflow);
 endmodule
 ``` 
 ## encoder
-```
+``` Verilog
 module encoder(in, valid, out);
 
     input [3:0] in; 
