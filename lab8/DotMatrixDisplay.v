@@ -31,7 +31,7 @@ module DotMatrixDisplay (clock , reset , dot_row , dot_col);
     input clock , reset ;
     output reg [7:0] dot_row , dot_col ;
     wire clk_div ;
-    reg row_count ;
+    reg[2:0] row_count ;
 
     fd f1( .clk_in(clock) , .reset(reset) , .clk_out(clk_div)) ;
     
@@ -56,6 +56,7 @@ module DotMatrixDisplay (clock , reset , dot_row , dot_col);
             3'd 6 : dot_row <= 8'b 11111101 ; 
             3'd 7 : dot_row <= 8'b 11111110 ; 
         endcase
+
         case(row_count) 
             3'd 0 : dot_col <= 8'b 00011000 ; 
             3'd 1 : dot_col <= 8'b 00100100 ; 
