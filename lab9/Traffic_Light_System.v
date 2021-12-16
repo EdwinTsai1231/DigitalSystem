@@ -169,48 +169,47 @@ module TrafficLight(clock , reset , dot_row , dot_col , out) ;
                     3'd 6 : dot_row <= 8'b 11111101 ; 
                     3'd 7 : dot_row <= 8'b 11111110 ; 
                 endcase
-            end
 
-        
-        case(curr)
-            green:begin 
-                case(row_count) 
-                    3'd 0 : dot_col <= 8'b 00001100 ; 
-                    3'd 1 : dot_col <= 8'b 00001100 ; 
-                    3'd 2 : dot_col <= 8'b 00011001 ; 
-                    3'd 3 : dot_col <= 8'b 01111110 ; 
-                    3'd 4 : dot_col <= 8'b 10011000 ; 
-                    3'd 5 : dot_col <= 8'b 00011000 ; 
-                    3'd 6 : dot_col <= 8'b 00101000 ; 
-                    3'd 7 : dot_col <= 8'b 01001000 ; 
-                endcase
-            end
+                case(curr)
+                    green:begin 
+                        case(row_count) 
+                            3'd 0 : dot_col <= 8'b 00001100 ; 
+                            3'd 1 : dot_col <= 8'b 00001100 ; 
+                            3'd 2 : dot_col <= 8'b 00011001 ; 
+                            3'd 3 : dot_col <= 8'b 01111110 ; 
+                            3'd 4 : dot_col <= 8'b 10011000 ; 
+                            3'd 5 : dot_col <= 8'b 00011000 ; 
+                            3'd 6 : dot_col <= 8'b 00101000 ; 
+                            3'd 7 : dot_col <= 8'b 01001000 ; 
+                        endcase
+                    end
 
-            yellow:begin
-                case(row_count) 
-                    3'd 0 : dot_col <= 8'b 00000000 ; 
-                    3'd 1 : dot_col <= 8'b 00100100 ; 
-                    3'd 2 : dot_col <= 8'b 00111100 ; 
-                    3'd 3 : dot_col <= 8'b 10111101 ; 
-                    3'd 4 : dot_col <= 8'b 11111111 ; 
-                    3'd 5 : dot_col <= 8'b 00111100 ; 
-                    3'd 6 : dot_col <= 8'b 00111100 ; 
-                    3'd 7 : dot_col <= 8'b 00000000 ; 
+                    yellow:begin
+                        case(row_count) 
+                            3'd 0 : dot_col <= 8'b 00000000 ; 
+                            3'd 1 : dot_col <= 8'b 00100100 ; 
+                            3'd 2 : dot_col <= 8'b 00111100 ; 
+                            3'd 3 : dot_col <= 8'b 10111101 ; 
+                            3'd 4 : dot_col <= 8'b 11111111 ; 
+                            3'd 5 : dot_col <= 8'b 00111100 ; 
+                            3'd 6 : dot_col <= 8'b 00111100 ; 
+                            3'd 7 : dot_col <= 8'b 00000000 ; 
+                        endcase
+                    end
+                
+                    red:begin
+                        case(row_count) 
+                            3'd 0 : dot_col <= 8'b 00011000 ; 
+                            3'd 1 : dot_col <= 8'b 00011000 ; 
+                            3'd 2 : dot_col <= 8'b 00111100 ; 
+                            3'd 3 : dot_col <= 8'b 00111100 ; 
+                            3'd 4 : dot_col <= 8'b 01011010 ; 
+                            3'd 5 : dot_col <= 8'b 00011000 ; 
+                            3'd 6 : dot_col <= 8'b 00011000 ; 
+                            3'd 7 : dot_col <= 8'b 00100100 ; 
+                        endcase
+                    end
                 endcase
-            end
-        
-            red:begin
-                case(row_count) 
-                    3'd 0 : dot_col <= 8'b 00011000 ; 
-                    3'd 1 : dot_col <= 8'b 00011000 ; 
-                    3'd 2 : dot_col <= 8'b 00111100 ; 
-                    3'd 3 : dot_col <= 8'b 00111100 ; 
-                    3'd 4 : dot_col <= 8'b 01011010 ; 
-                    3'd 5 : dot_col <= 8'b 00011000 ; 
-                    3'd 6 : dot_col <= 8'b 00011000 ; 
-                    3'd 7 : dot_col <= 8'b 00100100 ; 
-                endcase
-            end
-        endcase
-    end
+            end          
+        end
 endmodule
