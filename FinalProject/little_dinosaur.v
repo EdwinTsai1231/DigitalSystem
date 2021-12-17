@@ -26,8 +26,8 @@ module Display_fd(clk_in ,reset, clk_out) ;
     end
 endmodule
 
-`define SecondTime 32'd 25000000
-module Second_fd(clk_in ,reset, clk_out) ;
+`define UnitTime 32'd 25000
+module Unit_fd(clk_in ,reset, clk_out) ;
     input clk_in,reset ;
     output reg clk_out ;
     reg [31:0] count ;
@@ -41,7 +41,7 @@ module Second_fd(clk_in ,reset, clk_out) ;
             end
         else
             begin
-                if(count==`SecondTime)
+                if(count==`UnitTime)
                     begin
                         count <= 0;
                         clk_out <= ~clk_out;
@@ -81,41 +81,55 @@ module ssd(in,out);
     end
 endmodule
 
-module LD_state() ; // output a state 
+module LD_state(state) ; // output a state 
+    output [3:0] state ;
+
 endmodule
 
-module Obstacle(output_obstacle) ; // spawn the new obstacle
+module Obstacle(output_obstacle) ; // create a new obstacle
     output [1:0] output_obstacle ;
 
 endmodule
 
-module Hit() ;
+module Hit(hit) ;
+    output hit ;
 endmodule
 
 module Score();
 endmodule
 
 module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
-    input clock , restart , stop , up , down ;
-    output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ;
-    output reg [7:0] dot_row1 , dot_row2 ;
-    output [7:0]  dot_col1 ,  dot_col2  ;
-    output reg [2:0] life ;
-    reg[2:0] row_count;
+    input clock ; 
+    input restart , stop , up , down ; // button
+    output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
+    output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
+    reg[2:0] row_count ; // refresh the dot matrix 
+    wire [7:0]  col1 ,  col2  ; 
+    output reg [2:0] life ; // the life of the dinosaur 
     wire[3:0] state ; // the state of the little dinosaur 
     reg[7:0] map[1:0] ; // the map of the little dinosaur 
-    reg[1:0] spawn_obstacle ;
-    reg[1:0] control ;
+    wire[1:0] spawn_obstacle ; 
+    reg[1:0] obstacle;
+    reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
+    reg[15:0] record_obstacle ; // position of obstacle 
+    wire hit ;
+    wire [3:0] dinosaur ;
+    wire [7:0] temp ;
 
-    wire display_clk , second_clk ;
+    wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
 
-    Display_fd f1 (.clk_in(clock) , .reset(restart) , .clk_out(display_clk)) ;
-    Second_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(second_clk)) ;
+    Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
 
-    assign dot_col1 = map[0] ;
-    assign dot_col2 = map[1] ;
+    LD_state m1 (.state(state)) ;
+    Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
+    Hit m3 (.hit(hit)) ;
+    Score m4 () ;
 
-    always@(posedge display_clk , negedge restart) // renew the display
+    assign temp = map[0] ;
+    assign col1 = {(temp[7:4] & dinosaur) , temp[3:0]}  ; 
+    assign col2 = map[1] ;
+
+    always@(posedge unit_clk , negedge restart) // refresh the dot matrix 
     begin
         if(!restart)
             begin
@@ -167,54 +181,61 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
                     end
                 endcase
 
-                //case(state)
-                    //4'd 0 :
-                    //begin
-                      //  dot_col1 <= {/*state 4 bits*/,/*4 bits obstacle*/ }
-                      //  dot_col2 <= {/*8 bits obstacle*/} ;
-                    //end 
-                   /* 4'd 1 :
-                    4'd 2 :
-                    4'd 3 :
-                    4'd 4 :
-                    4'd 5 :
-                    4'd 6 :
-                    4'd 7 :
-                    4'd 8 :
-                    4'd 9 :
-                    4'd 10:
-                endcase*/
-
+                case(row_count)
+                    3'd 0 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 1 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 2 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 3 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 4 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 5 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 6 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end
+                    3'd 7 :
+                    begin
+                        dot_col1 <= col1 ; 
+                        dot_col2 <= col2 ; 
+                    end 
+                endcase
             end
     end
 
-    always@(posedge up , posedge down)
+    always@(posedge unit_clk)
     begin
-        //LD_state();
-    end
+        if(!hit)
+            gap = gap + 1 ;
+            if(gap == 3)
+                obstacle = spawn_obstacle ;
+            else
+                obstacle = obstacle ;
 
-    always@(posedge second_clk)
-    begin
-        control = control + 1 ;
-        {map[0],map[1],spawn_obstacle} = {map[0],map[1],spawn_obstacle} << 1 ;
+            {map[0],map[1],obstacle} = {map[0],map[1],obstacle} << 1 ;
     end
-
-    always@(control)
-    begin
-       /* if(control == 3)
-            Obstacle(.output_obstacle(spawn_obstacle)) ;
-            */
-    end
-
-    always@(posedge second_clk)
-    begin
-        //Score();
-    end
-
-    /*always@(posedge speed)
-    begin
-        Hit();
-    end
-    */
 
 endmodule
