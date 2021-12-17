@@ -84,21 +84,26 @@ endmodule
 module LD_state() ; // output a state 
 endmodule
 
-module little_dinosaur(clock , restart , stop , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
-    input clock , restart , stop ;
+module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
+    input clock , restart , stop  , up , down ;
     output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ;
-    output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2  ;
+    output reg [7:0] dot_row1 , dot_row2 ;
+    output [7:0]  dot_col1 ,  dot_col2  ;
     output reg [2:0] life ;
     reg[2:0] row_count;
     wire[3:0] state ; // the state of the little dinosaur 
     reg[7:0] map[1:0] ; // the map of the little dinosaur 
+    reg[1:0] spawn_obstacle ;
 
     wire display_clk , second_clk ;
 
     Display_fd f1 (.clk_in(clock) , .reset(restart) , .clk_out(display_clk)) ;
     Second_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(second_clk)) ;
 
-    always@(posedge display_clk , negedge restart )
+    assign dot_col1 = map[0] ;
+    assign dot_col2 = map[1] ;
+
+    always@(posedge display_clk , negedge restart ) // renew the display
     begin
         if(!restart)
             begin
@@ -171,6 +176,10 @@ module little_dinosaur(clock , restart , stop , ssd_out1 , ssd_out2 , ssd_out3 ,
             end
     end
 
+    always@(posedge second_clk)
+    begin
+        {map[0],map[1],spawn_obstacle} = {map[0],map[1],spawn_obstacle} << 1 ;
+    end
 
 
 
