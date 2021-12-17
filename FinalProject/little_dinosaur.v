@@ -84,8 +84,19 @@ endmodule
 module LD_state() ; // output a state 
 endmodule
 
+module Obstacle(output_obstacle) ; // spawn the new obstacle
+    output [1:0] output_obstacle ;
+
+endmodule
+
+module Hit() ;
+endmodule
+
+module Score();
+endmodule
+
 module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
-    input clock , restart , stop  , up , down ;
+    input clock , restart , stop , up , down ;
     output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ;
     output reg [7:0] dot_row1 , dot_row2 ;
     output [7:0]  dot_col1 ,  dot_col2  ;
@@ -94,6 +105,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     wire[3:0] state ; // the state of the little dinosaur 
     reg[7:0] map[1:0] ; // the map of the little dinosaur 
     reg[1:0] spawn_obstacle ;
+    reg[1:0] control ;
 
     wire display_clk , second_clk ;
 
@@ -103,7 +115,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     assign dot_col1 = map[0] ;
     assign dot_col2 = map[1] ;
 
-    always@(posedge display_clk , negedge restart ) // renew the display
+    always@(posedge display_clk , negedge restart) // renew the display
     begin
         if(!restart)
             begin
@@ -176,11 +188,33 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
             end
     end
 
+    always@(posedge up , posedge down)
+    begin
+        //LD_state();
+    end
+
     always@(posedge second_clk)
     begin
+        control = control + 1 ;
         {map[0],map[1],spawn_obstacle} = {map[0],map[1],spawn_obstacle} << 1 ;
     end
 
+    always@(control)
+    begin
+       /* if(control == 3)
+            Obstacle(.output_obstacle(spawn_obstacle)) ;
+            */
+    end
 
+    always@(posedge second_clk)
+    begin
+        //Score();
+    end
+
+    /*always@(posedge speed)
+    begin
+        Hit();
+    end
+    */
 
 endmodule
