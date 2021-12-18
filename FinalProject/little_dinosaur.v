@@ -111,45 +111,6 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 		end
 endmodule
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
-    input clock ; 
-    input restart , stop , up , down ; // button
-    output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
-    output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
-    reg[2:0] row_count ; // refresh the dot matrix 
-    wire [7:0]  col1 ,  col2  ; 
-    output reg [2:0] life ; // the life of the dinosaur 
-    wire[3:0] state ; // the state of the little dinosaur 
-    reg[7:0] map[1:0] ; // the map of the little dinosaur 
-    wire[1:0] spawn_obstacle ; 
-    reg[1:0] obstacle;
-    reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
-    reg[15:0] record_obstacle ; // position of obstacle 
-	 wire hit ;
-    wire [3:0] dinosaur ;
-    wire [7:0] temp ;
-    wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
-    wire [3:0] score_out1,score_out2,score_out3,score_out4;
-    Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
-
-    LD_state m1 (.state(state)) ;
-    Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
-    Hit m3 (.hit(hit)) ;
-    Score m4 (.unit_clk(unit_clk),.restart(restart),.score_out1(score_out1),.score_out2(score_out2),.score_out3(score_out3),.score_out4(score_out4));
-    ssd s1(.in(score_out1),.out(ssd_out1));
-    ssd s2(.in(score_out2),.out(ssd_out2));
-    ssd s3(.in(score_out3),.out(ssd_out3));
-    ssd s4(.in(score_out4),.out(ssd_out4));
-    assign temp = map[0] ;
-    assign col1 = {(temp[7:4] & dinosaur) , temp[3:0]}  ; 
-    assign col2 = map[1] ;
-
-    always@(posedge unit_clk , negedge restart) // refresh the dot matrix 
-=======
-=======
->>>>>>> Stashed changes
 module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
     input unit_clk , restart , stop , start ;
     input [7:0] col1 , col2 ;
@@ -157,10 +118,6 @@ module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_
     reg[2:0] row_count ; // stop the dot matrix
 
     always@(posedge unit_clk , negedge restart,  negedge stop , negedge start)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     begin
         if(!restart)
             begin
@@ -280,13 +237,20 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     wire [7:0] temp ;
     wire spd_map ;
     wire score ;
+    wire [3:0] score_out1,score_out2,score_out3,score_out4;
+
+    ssd s1(.in(score_out1),.out(ssd_out1));
+    ssd s2(.in(score_out2),.out(ssd_out2));
+    ssd s3(.in(score_out3),.out(ssd_out3));
+    ssd s4(.in(score_out4),.out(ssd_out4));
+
 
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
     Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
     // LD_state m1 (.state(state)) ;
     Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
     Hit m3 (.hit(hit)) ;
-    Score m4 () ;
+    Score m4 (unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
     Refresh m5 (unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
 
     assign temp = map[0] ;
