@@ -48,7 +48,7 @@ module Unit_fd(clk_in ,reset, clk_out) ;
                     end
                 else
                     begin
-                        count = count+1 ;
+                        count = count+1 ;//Is the notation between count and count+1 '=' or '<='?
                     end
             end
     end
@@ -95,10 +95,48 @@ module Hit(hit) ;
     output hit ;
 endmodule
 
-module Score();
+module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
+    input unit_clk,restart;
+    output reg [3:0] score_out1,score_out2,score_out3,score_out4;
+    reg[3:0] score;
+    
+    always@(posedge unit_clk , negedge restart)
+		begin
+		if(!restart)//initialize
+			begin
+			  score<=4'b 0;
+			end
+		else
+		   begin
+				if(score == 4'b 1111)
+					begin
+						score <=0;
+						if(score_out1 != 4'h f)
+							begin
+							    score_out1 <= score_out1 +1;
+							end
+						else if(score_out2 != 4'h f)
+							begin
+								score_out2 <= score_out2 +1;
+							end
+						else if(score_out3 != 4'h f)
+							begin
+								score_out3 <= score_out3 +1;							
+							end
+						else
+							begin
+								score_out4 <= score_out4 +1;							
+							end
+					end
+				else
+					begin
+						score <= score + 1;
+					end
+			end
+		end
 endmodule
 
-module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
+module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
     input clock ; 
     input restart , stop , up , down ; // button
     output [6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
@@ -112,19 +150,21 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     reg[1:0] obstacle;
     reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
     reg[15:0] record_obstacle ; // position of obstacle 
-    wire hit ;
+	 wire hit ;
     wire [3:0] dinosaur ;
     wire [7:0] temp ;
-
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
-
+    wire [3:0] score_out1,score_out2,score_out3,score_out4;
     Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
 
     LD_state m1 (.state(state)) ;
     Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
     Hit m3 (.hit(hit)) ;
-    Score m4 () ;
-
+    Score m4 (.unit_clk(unit_clk),.restart(restart),.score_out1(score_out1),.score_out2(score_out2),.score_out3(score_out3),.score_out4(score_out4));
+    ssd s1(.in(score_out1),.out(ssd_out1));
+    ssd s2(.in(score_out2),.out(ssd_out2));
+    ssd s3(.in(score_out3),.out(ssd_out3));
+    ssd s4(.in(score_out4),.out(ssd_out4));
     assign temp = map[0] ;
     assign col1 = {(temp[7:4] & dinosaur) , temp[3:0]}  ; 
     assign col2 = map[1] ;
