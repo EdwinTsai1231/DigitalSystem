@@ -112,6 +112,7 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 endmodule
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
     input clock ; 
     input restart , stop , up , down ; // button
@@ -147,6 +148,8 @@ module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 ,
 
     always@(posedge unit_clk , negedge restart) // refresh the dot matrix 
 =======
+=======
+>>>>>>> Stashed changes
 module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
     input unit_clk , restart , stop , start ;
     input [7:0] col1 , col2 ;
@@ -154,6 +157,9 @@ module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_
     reg[2:0] row_count ; // stop the dot matrix
 
     always@(posedge unit_clk , negedge restart,  negedge stop , negedge start)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     begin
         if(!restart)
