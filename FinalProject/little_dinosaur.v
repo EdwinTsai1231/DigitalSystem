@@ -1,33 +1,5 @@
-`define DisplayTime 32'd 2500
-module Display_fd(clk_in ,reset, clk_out) ;
-    input clk_in,reset ;
-    output reg clk_out ;
-    reg [31:0] count ;
-
-    always@(posedge clk_in)
-    begin
-        if(!reset)
-            begin
-                count<=32'd 0 ;
-                clk_out <= 1'b 0;
-            end
-        else
-            begin
-                if(count==`DisplayTime)
-                    begin
-                        count <= 0;
-                        clk_out <= ~clk_out;
-                    end
-                else
-                    begin
-                        count = count+1 ;
-                    end
-            end
-    end
-endmodule
-
 `define UnitTime 32'd 25000
-module Unit_fd(clk_in ,reset, clk_out) ;
+module Unit_fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     input clk_in,reset ;
     output reg clk_out ;
     reg [31:0] count ;
@@ -54,7 +26,7 @@ module Unit_fd(clk_in ,reset, clk_out) ;
     end
 endmodule
 
-module ssd(in,out);
+module ssd(in,out); // Seven Segments Display
     input [3:0] in ;
     output reg  [6:0] out ;
 
@@ -81,7 +53,10 @@ module ssd(in,out);
     end
 endmodule
 
-module LD_state(state) ; // output a state 
+module LD_state(spd_ldi , up , down , map_ld , state) ; // output a state
+    input spd_ldi ;
+    input up , down ;
+    output [3:0] map_ld ; 
     output [3:0] state ;
 
 endmodule
@@ -136,6 +111,7 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 		end
 endmodule
 
+<<<<<<< Updated upstream
 module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
     input clock ; 
     input restart , stop , up , down ; // button
@@ -170,15 +146,28 @@ module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 ,
     assign col2 = map[1] ;
 
     always@(posedge unit_clk , negedge restart) // refresh the dot matrix 
+=======
+module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
+    input unit_clk , restart , stop , start ;
+    input [7:0] col1 , col2 ;
+    output reg [7:0] dot_row1 , dot_row2 , dot_col1 , dot_col2 ;
+    reg[2:0] row_count ; // stop the dot matrix
+
+    always@(posedge unit_clk , negedge restart,  negedge stop , negedge start)
+>>>>>>> Stashed changes
     begin
         if(!restart)
             begin
-                // restart 
+                //initialization
             end
-        else
-            begin
-                row_count <= row_count+1 ;
-                case(row_count)
+            else if (!stop)
+                begin
+                    // stop the game
+                end
+            else
+                begin
+                    row_count <= row_count+1 ;
+                    case(row_count)
                     3'd 0 :
                     begin
                         dot_row1 <= 8'b 01111111 ; 
@@ -246,7 +235,7 @@ module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 ,
                     begin
                         dot_col1 <= col1 ; 
                         dot_col2 <= col2 ; 
-                    end
+                    end 
                     3'd 5 :
                     begin
                         dot_col1 <= col1 ; 
@@ -261,14 +250,45 @@ module little_dinosaur(clock , restart , stop , up , down ,ssd_out1 , ssd_out2 ,
                     begin
                         dot_col1 <= col1 ; 
                         dot_col2 <= col2 ; 
-                    end 
-                endcase
-            end
+                    end
+                    endcase
+                end
     end
+endmodule 
+
+module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
+    input clock ; 
+    input restart , start , stop , up , down ; // button
+    output[6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
+    output[7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
+    wire [7:0]  col1 ,  col2  ; 
+    output reg [2:0] life ; // the life of the dinosaur 
+    wire[3:0] state ; // the state number of the little dinosaur 
+    reg[7:0] map[1:0] ; // the map 
+    wire[1:0] spawn_obstacle ; 
+    reg[1:0] obstacle;
+    reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
+    reg[15:0] record_obstacle ; // position of obstacle 
+    wire hit ;
+    wire [3:0] map_ld ; // the map of the little dinosaur
+    wire [7:0] temp ;
+    wire spd_map ;
+    wire score ;
+
+    wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
+    Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
+    // LD_state m1 (.state(state)) ;
+    Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
+    Hit m3 (.hit(hit)) ;
+    Score m4 () ;
+    Refresh m5 (unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
+
+    assign temp = map[0] ;
+    assign col1 = {(temp[7:4] | map_ld) , temp[3:0]}  ; 
+    assign col2 = map[1] ;
 
     always@(posedge unit_clk)
     begin
-        if(!hit)
             gap = gap + 1 ;
             if(gap == 3)
                 obstacle = spawn_obstacle ;
