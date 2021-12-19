@@ -111,23 +111,19 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 		end
 endmodule
 
-module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
+module Refresh(unit_clk , col1 , col2 , restart , dot_row1 , dot_row2 , dot_col1 , dot_col2) ;
     input unit_clk , restart , stop , start ;
     input [7:0] col1 , col2 ;
     output reg [7:0] dot_row1 , dot_row2 , dot_col1 , dot_col2 ;
-    reg[2:0] row_count ; // stop the dot matrix
+    reg[2:0] row_count ; 
 
-    always@(posedge unit_clk , negedge restart,  negedge stop , negedge start)
+    always@(posedge unit_clk , negedge restart )
     begin
         if(!restart)
             begin
                 //initialization
             end
-            else if (!stop)
-                begin
-                    // stop the game
-                end
-            else
+        else
                 begin
                     row_count <= row_count+1 ;
                     case(row_count)
@@ -219,25 +215,36 @@ module Refresh(unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_
     end
 endmodule 
 
-module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ; // top module
+
+/* top module */
+module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
+    
+    /*device*/
     input clock ; 
     input restart , start , stop , up , down ; // button
     output[6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
     output[7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
-    wire [7:0]  col1 ,  col2  ; 
+    wire [3:0] score_out1,score_out2,score_out3,score_out4; // connect to the ssd 
+    wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
+    
+    /*map*/
+    wire [7:0]  col1 ,  col2  ; // Combine the mv_map and map_ld together , and send it to dot_col 
+    reg[7:0] mv_map[1:0] ; // the map 
+    wire [3:0] map_ld ; // the map of the little dinosaur
+    reg[15:0] record_obstacle ; // position of obstacle 
+    wire spd_map ;
+    wire [7:0] temp ;
+   
+    /*obstacle*/ 
+    wire[1:0] spawn_obstacle ; // generate obstacles
+    reg[1:0] obstacle; // spawn_obstacle give the generated one to obstacle
+    reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
+
+    /*other*/
     output reg [2:0] life ; // the life of the dinosaur 
     wire[3:0] state ; // the state number of the little dinosaur 
-    reg[7:0] map[1:0] ; // the map 
-    wire[1:0] spawn_obstacle ; 
-    reg[1:0] obstacle;
-    reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
-    reg[15:0] record_obstacle ; // position of obstacle 
-    wire hit ;
-    wire [3:0] map_ld ; // the map of the little dinosaur
-    wire [7:0] temp ;
-    wire spd_map ;
+    wire hit ; // check if the little dinosaur was hit or not 
     wire score ;
-    wire [3:0] score_out1,score_out2,score_out3,score_out4;
 
     ssd s1(.in(score_out1),.out(ssd_out1));
     ssd s2(.in(score_out2),.out(ssd_out2));
@@ -245,27 +252,42 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     ssd s4(.in(score_out4),.out(ssd_out4));
 
 
-    wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
     Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
     // LD_state m1 (.state(state)) ;
+
+    // create a new obstacle
     Obstacle m2 (.output_obstacle(spawn_obstacle)) ;
+    // check whether it was hit or not 
     Hit m3 (.hit(hit)) ;
-    Score m4 (unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
-    Refresh m5 (unit_clk , col1 , col2 , restart , stop , start , dot_row1 , dot_row2) ;
-
-    assign temp = map[0] ;
+    // the score is depends on game speed 
+    Score m4 (unit_clk,restart,score_out1,score_out2,score_out3,score_out4);
+    // refresh the map
+    Refresh m5 (unit_clk , col1 , col2 , restart , dot_row1 , dot_row2 , dot_col1 , dot_col2) ;
+    
+    // Combine the map
+    assign temp = mv_map[0] ;
     assign col1 = {(temp[7:4] | map_ld) , temp[3:0]}  ; 
-    assign col2 = map[1] ;
+    assign col2 = mv_map[1] ;
 
-    always@(posedge unit_clk)
+    // control the moving map 
+    always@(posedge unit_clk , negedge stop)
     begin
-            gap = gap + 1 ;
-            if(gap == 3)
-                obstacle = spawn_obstacle ;
-            else
-                obstacle = obstacle ;
-
-            {map[0],map[1],obstacle} = {map[0],map[1],obstacle} << 1 ;
+        if(stop)
+            begin
+                if(gap == 2'd 3)
+                    begin
+                    gap <= 2'd 0 ;
+                    obstacle <= spawn_obstacle ;
+                    end
+                else
+                    begin
+                    obstacle <= obstacle ;
+                    gap <= gap+1 ;
+                    end
+                {mv_map[0],mv_map[1],obstacle} <= {mv_map[0],mv_map[1],obstacle} << 1 ;
+            end
+        else
+            {mv_map[0],mv_map[1],obstacle} <= {mv_map[0],mv_map[1],obstacle} ;
     end
 
 endmodule
