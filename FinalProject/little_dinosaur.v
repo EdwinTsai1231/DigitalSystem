@@ -63,23 +63,144 @@ endmodule
 
 module Obstacle (unit_clk , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
+
     input unit_clk ;
     input [1:0] gap ;
-    output[1:0] spawn_obstacle_7 ;
-    output[1:0] spawn_obstacle_6 ;
-    output[1:0] spawn_obstacle_5 ;
-    output[1:0] spawn_obstacle_4 ;
-    output[1:0] spawn_obstacle_3 ;
-    output[1:0] spawn_obstacle_2 ;
-    output[1:0] spawn_obstacle_1 ;
-    output[1:0] spawn_obstacle_0 ;
+    output reg [1:0] spawn_obstacle_7 ;
+    output reg [1:0] spawn_obstacle_6 ;
+    output reg [1:0] spawn_obstacle_5 ;
+    output reg [1:0] spawn_obstacle_4 ;
+    output reg [1:0] spawn_obstacle_3 ;
+    output reg [1:0] spawn_obstacle_2 ;
+    output reg [1:0] spawn_obstacle_1 ;
+    output reg [1:0] spawn_obstacle_0 ;
+    reg [2:0] ran ;
 
-    
-
+    always@(posedge unit_clk)
+    begin
+        ran <= $random % 8 ;
+        case(ran)
+        3'd 0 :begin
+            spawn_obstacle_0 <= 2'b 00 ;
+            spawn_obstacle_1 <= 2'b 00 ;
+            spawn_obstacle_2 <= 2'b 00 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 11 ;
+            spawn_obstacle_6 <= 2'b 11 ;
+            spawn_obstacle_7 <= 2'b 11 ; 
+        end
+        3'd 1 :begin
+            spawn_obstacle_0 <= 2'b 11 ;
+            spawn_obstacle_1 <= 2'b 11 ;
+            spawn_obstacle_2 <= 2'b 11 ;
+            spawn_obstacle_3 <= 2'b 11 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 00 ;
+            spawn_obstacle_6 <= 2'b 00 ;
+            spawn_obstacle_7 <= 2'b 00 ;  
+        end
+        3'd 2 :begin
+            spawn_obstacle_0 <= 2'b 11 ;
+            spawn_obstacle_1 <= 2'b 11 ;
+            spawn_obstacle_2 <= 2'b 00 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 00 ;
+            spawn_obstacle_6 <= 2'b 11 ;
+            spawn_obstacle_7 <= 2'b 11 ; 
+        end
+        3'd 3 :begin
+            spawn_obstacle_0 <= 2'b 00 ;
+            spawn_obstacle_1 <= 2'b 00 ;
+            spawn_obstacle_2 <= 2'b 00 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 11 ;
+            spawn_obstacle_6 <= 2'b 11 ;
+            spawn_obstacle_7 <= 2'b 11 ; 
+        end
+        3'd 4 :begin
+            spawn_obstacle_0 <= 2'b 11 ;
+            spawn_obstacle_1 <= 2'b 00 ;
+            spawn_obstacle_2 <= 2'b 00 ;
+            spawn_obstacle_3 <= 2'b 11 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 00 ;
+            spawn_obstacle_6 <= 2'b 00 ;
+            spawn_obstacle_7 <= 2'b 11 ; 
+        end
+        3'd 5 :begin
+            spawn_obstacle_0 <= 2'b 11 ;
+            spawn_obstacle_1 <= 2'b 11 ;
+            spawn_obstacle_2 <= 2'b 11 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 00 ;
+            spawn_obstacle_6 <= 2'b 00 ;
+            spawn_obstacle_7 <= 2'b 11 ; 
+        end
+        3'd 6 :begin
+            spawn_obstacle_0 <= 2'b 11 ;
+            spawn_obstacle_1 <= 2'b 11 ;
+            spawn_obstacle_2 <= 2'b 00 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 11 ;
+            spawn_obstacle_6 <= 2'b 00 ;
+            spawn_obstacle_7 <= 2'b 11 ;  
+        end
+        3'd 7 :begin
+            spawn_obstacle_0 <= 2'b 01 ;
+            spawn_obstacle_1 <= 2'b 01 ;
+            spawn_obstacle_2 <= 2'b 11 ;
+            spawn_obstacle_3 <= 2'b 00 ;
+            spawn_obstacle_4 <= 2'b 00 ;
+            spawn_obstacle_5 <= 2'b 11 ;
+            spawn_obstacle_6 <= 2'b 01 ;
+            spawn_obstacle_7 <= 2'b 01 ;  
+        end
+        endcase
+    end
 endmodule
 
-module Hit(hit) ;
-    output hit ;
+module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  , record_obstacle_4  , record_obstacle_3  , record_obstacle_2  ,
+            record_obstacle_1 , record_obstacle_0 ,map_ld_7, map_ld_6 , map_ld_5 , map_ld_4 , map_ld_3 , map_ld_2 , map_ld_1 , map_ld_0 ,
+             hit) ;
+    input unit_clk ;
+    input[15:0] record_obstacle_7 ;
+    input[15:0] record_obstacle_6 ;
+    input[15:0] record_obstacle_5 ;
+    input[15:0] record_obstacle_4 ;
+    input[15:0] record_obstacle_3 ;
+    input[15:0] record_obstacle_2 ;
+    input[15:0] record_obstacle_1 ;
+    input[15:0] record_obstacle_0 ;
+    input[3:0] map_ld_7 ; 
+    input[3:0] map_ld_6 ; 
+    input[3:0] map_ld_5 ; 
+    input[3:0] map_ld_4 ; 
+    input[3:0] map_ld_3 ; 
+    input[3:0] map_ld_2 ; 
+    input[3:0] map_ld_1 ; 
+    input[3:0] map_ld_0 ; 
+    output reg hit ;
+
+    always@(posedge unit_clk)
+        begin
+
+        hit <=( (record_obstacle_7[3] & map_ld_7[3])  || (record_obstacle_7[2] & map_ld_7[2]) || (record_obstacle_7[1] & map_ld_7[1]) ||(record_obstacle_7[0] & map_ld_7[0]) ||
+            (record_obstacle_6[3] & map_ld_6[3])  || (record_obstacle_6[2] & map_ld_6[2]) || (record_obstacle_6[1] & map_ld_6[1]) ||(record_obstacle_6[0] & map_ld_6[0]) ||
+            (record_obstacle_5[3] & map_ld_5[3])  || (record_obstacle_5[2] & map_ld_5[2]) || (record_obstacle_5[1] & map_ld_5[1]) ||(record_obstacle_5[0] & map_ld_5[0]) ||
+            (record_obstacle_4[3] & map_ld_4[3])  || (record_obstacle_4[2] & map_ld_4[2]) || (record_obstacle_4[1] & map_ld_4[1]) ||(record_obstacle_4[0] & map_ld_4[0]) ||
+            (record_obstacle_3[3] & map_ld_3[3])  || (record_obstacle_3[2] & map_ld_3[2]) || (record_obstacle_3[1] & map_ld_3[1]) ||(record_obstacle_3[0] & map_ld_3[0]) ||
+            (record_obstacle_2[3] & map_ld_2[3])  || (record_obstacle_2[2] & map_ld_2[2]) || (record_obstacle_2[1] & map_ld_2[1]) ||(record_obstacle_2[0] & map_ld_2[0]) ||
+            (record_obstacle_1[3] & map_ld_1[3])  || (record_obstacle_1[2] & map_ld_1[2]) || (record_obstacle_1[1] & map_ld_1[1]) ||(record_obstacle_1[0] & map_ld_1[0]) ||
+            (record_obstacle_0[3] & map_ld_0[3])  || (record_obstacle_0[2] & map_ld_0[2]) || (record_obstacle_0[1] & map_ld_0[1]) ||(record_obstacle_0[0] & map_ld_0[0]) 
+            ) ? 1:0 ;
+
+        end
+
 endmodule
 
 module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
@@ -138,7 +259,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     wire[7:0] col1[7:0] ,  col2[7:0]  ; // Combine the mv_map and map_ld together , and send it to dot_col 
     reg[7:0] mv_map[7:0][1:0] ; // the map only need to record the column  
     wire [3:0] map_ld[7:0] ; // the map of the little dinosaur
-    reg[15:0] record_obstacle[7:0] ; // position of obstacle 
+    reg [15:0] record_obstacle[7:0] ; // position of obstacle 
     wire spd_map ;
     wire [7:0] temp[7:0] ;
    
@@ -168,13 +289,14 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     ,spawn_obstacle[2] , spawn_obstacle[1] , spawn_obstacle[0] ) ;
 
     // check whether it was hit or not 
-    Hit m3 (.hit(hit)) ;
+    Hit m3 (unit_clk, record_obstacle[7] , record_obstacle[6],record_obstacle[5] , record_obstacle[4] , record_obstacle[3] , record_obstacle[2] ,
+            record_obstacle[1] , record_obstacle[0] , map_ld[7] , map_ld[6] ,map_ld[5] , map_ld[4] ,map_ld[3] , map_ld[2] ,  map_ld[1],
+            map_ld[0] ,hit) ;
+
     // the score is depends on game speed 
     Score m4 (unit_clk,restart,score_out1,score_out2,score_out3,score_out4);
-    // refresh the map
     
-    // Combine the map
-    
+    // Combine the map 
     assign temp[0] = mv_map[0][0] ;
     assign col1[0] = {(temp[0][7:4] | map_ld[0]) , temp[0][3:0]}  ; 
     assign col2[0] = mv_map[0][1] ;
@@ -207,7 +329,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     assign col1[7] = {(temp[7][7:4] | map_ld[7]) , temp[7][3:0]}  ; 
     assign col2[7] = mv_map[7][1] ;
 
-
+    // refresh the map
     always@(posedge unit_clk , negedge restart )
     begin
         if(!restart)
@@ -317,6 +439,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
                     for(i=0 ; i< 8  ; i++)
                         begin
                             obstacle[i] <= spawn_obstacle[i] ;
+                            record_obstacle[i][1:0] <= spawn_obstacle[i] ; // the obstacle map 
                         end
                     end
                 else
@@ -324,16 +447,20 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
                     for(i = 0 ; i < 8 ; i++)
                         begin
                             obstacle[i] <= obstacle[i] ;
+                            record_obstacle[i] <= record_obstacle[i] << 1 ; // the obstacle map 
                             gap <= gap+1 ;
                         end
                     end
+
+
 
                 for(i = 0 ; i < 8 ; i++)
                     begin
                         {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} << 1 ;
                     end
             end
-        else
+
+        else // stop the game 
             for(i = 0 ; i < 8 ; i++)
                 begin
                     {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} ;
