@@ -68,11 +68,11 @@ endmodule
 
 
 /* finish but not test yet */
-module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
+module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
 
     input unit_clk ;
-    input restart ;
+    input reset ;
     input [1:0] gap ;
     output reg [1:0] spawn_obstacle_7 ;
     output reg [1:0] spawn_obstacle_6 ;
@@ -90,7 +90,7 @@ module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6
 	wire o_LFSR_Done;
 
     /* random number generator */
-    LFSR #(.NUM_BITS(32)) dut( unit_clk , restart, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
+    LFSR #(.NUM_BITS(32)) dut( unit_clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
 
     always@(posedge unit_clk)
     begin
@@ -222,14 +222,14 @@ endmodule
 
 /* Author : wadxs90123 
    finished but not test yet */
-module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
-    input unit_clk,restart;
+module Score(unit_clk,reset,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
+    input unit_clk,reset;
     output reg [3:0] score_out1,score_out2,score_out3,score_out4;
     reg[3:0] score;
     
-    always@(posedge unit_clk , negedge restart)
+    always@(posedge unit_clk , negedge reset)
 		begin
-		if(!restart)//initialize
+		if(!reset)//initialize
 			begin
 			  score<=4'b 0;
 			end
@@ -395,7 +395,7 @@ module LFSR #(parameter NUM_BITS = 32)(
         end
         30: begin
           r_XNOR = r_LFSR[30] ^~ r_LFSR[6] ^~ r_LFSR[4] ^~ r_LFSR[1];
-        end
+        end 
         31: begin
           r_XNOR = r_LFSR[31] ^~ r_LFSR[28];
         end
@@ -412,15 +412,21 @@ module LFSR #(parameter NUM_BITS = 32)(
 endmodule // LFSR
 
 /* top module */
-module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
+`define padTime 10 
+module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
     
     /*device*/
-    input clock ; 
-    input restart , start , stop , up , down ; // button
+    input clock , reset ;
+    input [3:0] keypadCol ;	
+	output reg [3:0] keypadRow ; 
     output[6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
     output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
     wire [3:0] score_out1,score_out2,score_out3,score_out4; // connect to the ssd 
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
+    reg [3:0] keypadBuf ;
+	reg [3:0] keypadDelay ;
+    reg stop , start , restart , up , down ;
+
     
     /*map*/
     wire[7:0] col1[7:0] ,  col2[7:0]  ; // Combine the mv_map and map_ld together , and send it to dot_col 
@@ -449,11 +455,11 @@ module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd
     ssd s4(.in(score_out4),.out(ssd_out4));
 
 
-    Unit_fd f2 (.clk_in(clock) , .reset(restart) , .clk_out(unit_clk)) ; // frequency divider 
+    Unit_fd f2 (.clk_in(clock) , .reset(reset) , .clk_out(unit_clk)) ; // frequency divider 
     // LD_state m1 (.state(state)) ;
 
     // create a new obstacle
-    Obstacle m2_0 (unit_clk , restart , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
+    Obstacle m2 (unit_clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
     ,spawn_obstacle[2] , spawn_obstacle[1] , spawn_obstacle[0] ) ;
 
     // check whether it was hit or not 
@@ -462,7 +468,7 @@ module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd
             map_ld[0] ,hit) ;
 
     // the score is depends on game speed 
-    Score m4 (unit_clk,restart,score_out1,score_out2,score_out3,score_out4);
+    Score m4 (unit_clk,reset,score_out1,score_out2,score_out3,score_out4);
     
     // Combine the map 
     assign temp[0] = mv_map[0][0] ;
@@ -498,9 +504,9 @@ module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd
     assign col2[7] = mv_map[7][1] ;
 
     // refresh the map
-    always@(posedge unit_clk , negedge restart )
+    always@(posedge unit_clk , negedge reset )
     begin
-        if(!restart)
+        if(!reset)
             begin
                 //initialization
             end
@@ -597,9 +603,9 @@ module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd
     
     integer i ;
     // control the moving map 
-    always@(posedge unit_clk , negedge stop)
+    always@(posedge unit_clk , posedge stop)
     begin
-        if(stop==0)
+        if(stop == 0)
             begin
                 if(gap == 2'd 3)
                     begin
@@ -634,4 +640,83 @@ module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd
                     {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} ;
                 end
     end
+
+    always@(posedge unit_clk)
+	begin
+		if(!reset)
+		begin
+			keypadRow <= 4'b 1110 ;
+			keypadBuf <= 4'b 0000 ;
+			keypadDelay <= 4'd 0 ;
+		end
+		else
+		begin
+			if(keypadDelay == `padTime)
+			begin
+				keypadDelay <= 31'd 0 ;
+				case({keypadRow, keypadCol})
+					8'b1110_1011 : keypadBuf <= 4'h1; // down
+					8'b1101_1011 : keypadBuf <= 4'h2; // up 
+					8'b0111_1101 : keypadBuf <= 4'hd; // start
+					8'b0111_1011 : keypadBuf <= 4'he; // stop
+					8'b0111_0111 : keypadBuf <= 4'hf; // restart
+					default : keypadBuf <= keypadBuf;
+				endcase
+
+				case(keypadRow)
+					4'b1110 : keypadRow <= 4'b1101;
+					4'b1101 : keypadRow <= 4'b1011;
+					4'b1011 : keypadRow <= 4'b0111;
+					4'b0111 : keypadRow <= 4'b1110;
+					default : keypadRow <= 4'b1110;
+				endcase
+			end
+		else
+			keypadDelay <= keypadDelay + 1'd 1 ;
+		end
+	end
+
+    always@(keypadBuf)
+    begin
+        case(keypadBuf)
+            4'h 1 :begin
+                down = 1 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+
+            4'h 2 :begin
+                down = 0 ;
+                up = 1 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+
+            4'h d :begin
+                down = 0 ;
+                up = 0 ;
+                start = 1 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+            4'h e :begin
+                down = 0 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 1 ;
+                restart = 0 ;
+            end
+            4'h f :begin
+                down = 0 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 1 ;
+            end
+        endcase
+    end
+
 endmodule
