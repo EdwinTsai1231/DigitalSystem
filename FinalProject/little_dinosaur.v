@@ -215,25 +215,44 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 			end
 		else
 		   begin
-				if(score == 4'b 1111)
+				if(score == 4'b 1111)//can set another number,not only 16 ,"score" is just a timer
 					begin
 						score <=0;
 						if(score_out1 != 4'h f)
 							begin
 							    score_out1 <= score_out1 +1;
 							end
-						else if(score_out2 != 4'h f)
-							begin
-								score_out2 <= score_out2 +1;
-							end
-						else if(score_out3 != 4'h f)
-							begin
-								score_out3 <= score_out3 +1;							
-							end
-						else
-							begin
-								score_out4 <= score_out4 +1;							
-							end
+					    else
+					        begin
+					            score_out1 <= 0;
+					            if(score_out2 != 4'h f)
+					        	    begin
+					        	        score_out2 <= score_out2 +1;
+					                end
+					            else
+					                begin
+					                    score_out2 <= 0;
+					                    if(score_out3!=4'h f)
+					                        begin
+					                            score_out3 <= score_out3 +1;
+					                        end
+					                    else
+					                        begin
+					                            score_out3 <= 0;
+					                            if(score_out4!= 4'h f)
+					                                begin
+					                                    score_out4 <= score_out4 +1;
+					                                end 
+					                            else
+					                                begin
+					                                    score_out1 <= 0;
+					                                    score_out2 <= 0;
+					                                    score_out3 <= 0;
+					                                    score_out4 <= 0;//re-count from 0000...
+					                                end
+					                        end
+					                end
+					        end
 					end
 				else
 					begin
