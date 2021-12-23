@@ -1,3 +1,5 @@
+
+/* complete */
 `define UnitTime 32'd 25000
 module Unit_fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     input clk_in,reset ;
@@ -26,6 +28,7 @@ module Unit_fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     end
 endmodule
 
+/* complete */
 module ssd(in,out); // Seven Segments Display
     input [3:0] in ;
     output reg  [6:0] out ;
@@ -53,6 +56,8 @@ module ssd(in,out); // Seven Segments Display
     end
 endmodule
 
+
+/* not complete yet */
 module LD_state(spd_ldi , up , down , map_ld , state) ; // output a state
     input spd_ldi ;
     input up , down ;
@@ -61,6 +66,8 @@ module LD_state(spd_ldi , up , down , map_ld , state) ; // output a state
 
 endmodule
 
+
+/* finish but not test yet */
 module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
 
@@ -83,16 +90,7 @@ module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6
 	wire o_LFSR_Done;
 
     /* random number generator */
-
-    LFSR #(.NUM_BITS(32)) dut(	.i_Clk(unit_clk),
-								.i_Enable(restart),
-								.i_Seed_DV(i_Seed_DV),
-								.i_Seed_Data(i_Seed_Data),
-								.o_LFSR_Data(o_LFSR_Data),
-								.o_LFSR_Done(o_LFSR_Done)
-                                    );
-
-
+    LFSR #(.NUM_BITS(32)) dut( unit_clk , restart, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
 
     always@(posedge unit_clk)
     begin
@@ -182,6 +180,7 @@ module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6
     end
 endmodule
 
+/* finish but not test yet */
 module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  , record_obstacle_4  , record_obstacle_3  , record_obstacle_2  ,
             record_obstacle_1 , record_obstacle_0 ,map_ld_7, map_ld_6 , map_ld_5 , map_ld_4 , map_ld_3 , map_ld_2 , map_ld_1 , map_ld_0 ,
              hit) ;
@@ -220,6 +219,9 @@ module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  
         end
 endmodule
 
+
+/* Author : wadxs90123 
+   finished but not test yet */
 module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
     input unit_clk,restart;
     output reg [3:0] score_out1,score_out2,score_out3,score_out4;
@@ -280,6 +282,7 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 		end
 endmodule
 
+/* pseudo random number generator */
 module LFSR #(parameter NUM_BITS = 32)(
    input i_Clk,
    input i_Enable,
@@ -295,10 +298,6 @@ module LFSR #(parameter NUM_BITS = 32)(
   reg [NUM_BITS:1] r_LFSR = 0;
   reg              r_XNOR;
 
-
-  // Purpose: Load up LFSR with Seed if Data Valid (DV) pulse is detected.
-  // Othewise just run LFSR when enabled.
-  // 初始化seed值可以選擇載入，
   always @(posedge i_Clk)
     begin
       if (i_Enable == 1'b1)
@@ -309,11 +308,6 @@ module LFSR #(parameter NUM_BITS = 32)(
             r_LFSR <= {r_LFSR[NUM_BITS-1:1], r_XNOR};
         end
     end
-
-  // Create Feedback Polynomials.  Based on Application Note:
-  // http://www.xilinx.com/support/documentation/application_notes/xapp052.pdf
-  //使用同或運算，初始化種子不能全1
-
 
   always @(*)
     begin
@@ -412,11 +406,7 @@ module LFSR #(parameter NUM_BITS = 32)(
       endcase // case (NUM_BITS)
     end // always @ (*)
 
-
   assign o_LFSR_Data = r_LFSR[NUM_BITS:1];
-
-  // Conditional Assignment (?)
-  //一個循壞結束，數據個數2^NUM_BITS -1
   assign o_LFSR_Done = (r_LFSR[NUM_BITS:1] == i_Seed_Data) ? 1'b1 : 1'b0;
 
 endmodule // LFSR
