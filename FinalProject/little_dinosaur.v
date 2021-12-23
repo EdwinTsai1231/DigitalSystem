@@ -200,7 +200,6 @@ module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  
             ) ? 1:0 ;
 
         end
-
 endmodule
 
 module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The score is depands on game speed , so we just need to change the game speed
@@ -260,7 +259,6 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     reg[7:0] mv_map[7:0][1:0] ; // the map only need to record the column  
     wire [3:0] map_ld[7:0] ; // the map of the little dinosaur
     reg [15:0] record_obstacle[7:0] ; // position of obstacle 
-    wire spd_map ;
     wire [7:0] temp[7:0] ;
    
     /*obstacle*/ 
@@ -274,6 +272,8 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     wire hit ; // check if the little dinosaur was hit or not 
     wire score ;
     reg [2:0] row_count ;
+
+    /*speed*/
 
     ssd s1(.in(score_out1),.out(ssd_out1));
     ssd s2(.in(score_out2),.out(ssd_out2));
