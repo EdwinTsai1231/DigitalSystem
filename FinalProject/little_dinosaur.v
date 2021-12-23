@@ -61,10 +61,11 @@ module LD_state(spd_ldi , up , down , map_ld , state) ; // output a state
 
 endmodule
 
-module Obstacle (unit_clk , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
+module Obstacle (unit_clk  , restart , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
 
     input unit_clk ;
+    input restart ;
     input [1:0] gap ;
     output reg [1:0] spawn_obstacle_7 ;
     output reg [1:0] spawn_obstacle_6 ;
@@ -74,11 +75,28 @@ module Obstacle (unit_clk , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_ob
     output reg [1:0] spawn_obstacle_2 ;
     output reg [1:0] spawn_obstacle_1 ;
     output reg [1:0] spawn_obstacle_0 ;
-    reg [2:0] ran ;
+    reg[2:0] ran ;
+    wire[31:0] random ;
+    reg i_Seed_DV;
+	reg [31:0] i_Seed_Data;
+	wire [31:0] o_LFSR_Data;
+	wire o_LFSR_Done;
+
+    /* random number generator */
+
+    LFSR #(.NUM_BITS(32)) dut(	.i_Clk(unit_clk),
+								.i_Enable(restart),
+								.i_Seed_DV(i_Seed_DV),
+								.i_Seed_Data(i_Seed_Data),
+								.o_LFSR_Data(o_LFSR_Data),
+								.o_LFSR_Done(o_LFSR_Done)
+                                    );
+
+
 
     always@(posedge unit_clk)
     begin
-        ran <= $random % 8 ;
+        ran <= o_LFSR_Data % 8 ;
         case(ran)
         3'd 0 :begin
             spawn_obstacle_0 <= 2'b 00 ;
@@ -262,6 +280,147 @@ module Score(unit_clk,restart,score_out1,score_out2,score_out3,score_out4);//The
 		end
 endmodule
 
+module LFSR #(parameter NUM_BITS = 32)(
+   input i_Clk,
+   input i_Enable,
+
+   // Optional Seed Value
+   input i_Seed_DV,
+   input [NUM_BITS-1:0] i_Seed_Data,
+
+   output [NUM_BITS-1:0] o_LFSR_Data,
+   output o_LFSR_Done
+   );
+
+  reg [NUM_BITS:1] r_LFSR = 0;
+  reg              r_XNOR;
+
+
+  // Purpose: Load up LFSR with Seed if Data Valid (DV) pulse is detected.
+  // Othewise just run LFSR when enabled.
+  // 初始化seed值可以選擇載入，
+  always @(posedge i_Clk)
+    begin
+      if (i_Enable == 1'b1)
+        begin
+          if (i_Seed_DV == 1'b1)
+            r_LFSR <= i_Seed_Data;
+          else
+            r_LFSR <= {r_LFSR[NUM_BITS-1:1], r_XNOR};
+        end
+    end
+
+  // Create Feedback Polynomials.  Based on Application Note:
+  // http://www.xilinx.com/support/documentation/application_notes/xapp052.pdf
+  //使用同或運算，初始化種子不能全1
+
+
+  always @(*)
+    begin
+      case (NUM_BITS)
+        3: begin
+          r_XNOR = r_LFSR[3] ^~ r_LFSR[2];
+        end
+        4: begin
+          r_XNOR = r_LFSR[4] ^~ r_LFSR[3];
+        end
+        5: begin
+          r_XNOR = r_LFSR[5] ^~ r_LFSR[3];
+        end
+        6: begin
+          r_XNOR = r_LFSR[6] ^~ r_LFSR[5];
+        end
+        7: begin
+          r_XNOR = r_LFSR[7] ^~ r_LFSR[6];
+        end
+        8: begin
+          r_XNOR = r_LFSR[8] ^~ r_LFSR[6] ^~ r_LFSR[5] ^~ r_LFSR[4];
+        end
+        9: begin
+          r_XNOR = r_LFSR[9] ^~ r_LFSR[5];
+        end
+        10: begin
+          r_XNOR = r_LFSR[10] ^~ r_LFSR[7];
+        end
+        11: begin
+          r_XNOR = r_LFSR[11] ^~ r_LFSR[9];
+        end
+        12: begin
+          r_XNOR = r_LFSR[12] ^~ r_LFSR[6] ^~ r_LFSR[4] ^~ r_LFSR[1];
+        end
+        13: begin
+          r_XNOR = r_LFSR[13] ^~ r_LFSR[4] ^~ r_LFSR[3] ^~ r_LFSR[1];
+        end
+        14: begin
+          r_XNOR = r_LFSR[14] ^~ r_LFSR[5] ^~ r_LFSR[3] ^~ r_LFSR[1];
+        end
+        15: begin
+          r_XNOR = r_LFSR[15] ^~ r_LFSR[14];
+        end
+        16: begin
+          r_XNOR = r_LFSR[16] ^~ r_LFSR[15] ^~ r_LFSR[13] ^~ r_LFSR[4];
+          end
+        17: begin
+          r_XNOR = r_LFSR[17] ^~ r_LFSR[14];
+        end
+        18: begin
+          r_XNOR = r_LFSR[18] ^~ r_LFSR[11];
+        end
+        19: begin
+          r_XNOR = r_LFSR[19] ^~ r_LFSR[6] ^~ r_LFSR[2] ^~ r_LFSR[1];
+        end
+        20: begin
+          r_XNOR = r_LFSR[20] ^~ r_LFSR[17];
+        end
+        21: begin
+          r_XNOR = r_LFSR[21] ^~ r_LFSR[19];
+        end
+        22: begin
+          r_XNOR = r_LFSR[22] ^~ r_LFSR[21];
+        end
+        23: begin
+          r_XNOR = r_LFSR[23] ^~ r_LFSR[18];
+        end
+        24: begin
+          r_XNOR = r_LFSR[24] ^~ r_LFSR[23] ^~ r_LFSR[22] ^~ r_LFSR[17];
+        end
+        25: begin
+          r_XNOR = r_LFSR[25] ^~ r_LFSR[22];
+        end
+        26: begin
+          r_XNOR = r_LFSR[26] ^~ r_LFSR[6] ^~ r_LFSR[2] ^~ r_LFSR[1];
+        end
+        27: begin
+          r_XNOR = r_LFSR[27] ^~ r_LFSR[5] ^~ r_LFSR[2] ^~ r_LFSR[1];
+        end
+        28: begin
+          r_XNOR = r_LFSR[28] ^~ r_LFSR[25];
+        end
+        29: begin
+          r_XNOR = r_LFSR[29] ^~ r_LFSR[27];
+        end
+        30: begin
+          r_XNOR = r_LFSR[30] ^~ r_LFSR[6] ^~ r_LFSR[4] ^~ r_LFSR[1];
+        end
+        31: begin
+          r_XNOR = r_LFSR[31] ^~ r_LFSR[28];
+        end
+        32: begin
+          r_XNOR = r_LFSR[32] ^~ r_LFSR[22] ^~ r_LFSR[2] ^~ r_LFSR[1];
+        end
+
+      endcase // case (NUM_BITS)
+    end // always @ (*)
+
+
+  assign o_LFSR_Data = r_LFSR[NUM_BITS:1];
+
+  // Conditional Assignment (?)
+  //一個循壞結束，數據個數2^NUM_BITS -1
+  assign o_LFSR_Done = (r_LFSR[NUM_BITS:1] == i_Seed_Data) ? 1'b1 : 1'b0;
+
+endmodule // LFSR
+
 /* top module */
 module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
     
@@ -304,7 +463,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     // LD_state m1 (.state(state)) ;
 
     // create a new obstacle
-    Obstacle m2_0 (unit_clk , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
+    Obstacle m2_0 (unit_clk , restart , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
     ,spawn_obstacle[2] , spawn_obstacle[1] , spawn_obstacle[0] ) ;
 
     // check whether it was hit or not 
@@ -450,12 +609,12 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
     // control the moving map 
     always@(posedge unit_clk , negedge stop)
     begin
-        if(stop)
+        if(stop==0)
             begin
                 if(gap == 2'd 3)
                     begin
                     gap <= 2'd 0 ;
-                    for(i=0 ; i< 8  ; i++)
+                    for(i=0 ; i< 8  ; i = i+1 ) 
                         begin
                             obstacle[i] <= spawn_obstacle[i] ;
                             record_obstacle[i][1:0] <= spawn_obstacle[i] ; // the obstacle map 
@@ -463,7 +622,7 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
                     end
                 else
                     begin
-                    for(i = 0 ; i < 8 ; i++)
+                    for(i = 0 ; i < 8 ; i = i+1 )
                         begin
                             obstacle[i] <= obstacle[i] ;
                             record_obstacle[i] <= record_obstacle[i] << 1 ; // the obstacle map 
@@ -471,16 +630,16 @@ module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 
                         end
                     end
 
-
-
-                for(i = 0 ; i < 8 ; i++)
+                
+                // outside the if-else condition 
+                for(i = 0 ; i < 8 ; i = i+1 )
                     begin
                         {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} << 1 ;
                     end
             end
 
         else // stop the game 
-            for(i = 0 ; i < 8 ; i++)
+            for(i = 0 ; i < 8 ; i = i+1 )
                 begin
                     {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} ;
                 end
