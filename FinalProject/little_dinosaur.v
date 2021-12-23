@@ -422,7 +422,7 @@ module LFSR #(parameter NUM_BITS = 32)(
 endmodule // LFSR
 
 /* top module */
-module little_dinosaur(clock , restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
+module little_dinosaur(clock ,start, restart , stop , up , down , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
     
     /*device*/
     input clock ; 
