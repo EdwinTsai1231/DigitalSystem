@@ -210,7 +210,7 @@ endmodule
 /* finish but not test yet */
 module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  , record_obstacle_4  , record_obstacle_3  , record_obstacle_2  ,
             record_obstacle_1 , record_obstacle_0 ,map_ld_7, map_ld_6 , map_ld_5 , map_ld_4 , map_ld_3 , map_ld_2 , map_ld_1 , map_ld_0 ,
-             hit) ;
+            life3 , life2 , life1 , GameOver ) ;
     input unit_clk ;
     input[15:0] record_obstacle_7 ;
     input[15:0] record_obstacle_6 ;
@@ -228,7 +228,9 @@ module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  
     input[3:0] map_ld_2 ; 
     input[3:0] map_ld_1 ; 
     input[3:0] map_ld_0 ; 
-    output reg hit ;
+    output reg life3 , life2 , life1 ;
+    output reg GameOver ; 
+    reg hit ;
 
     always@(posedge unit_clk)
         begin
@@ -244,6 +246,38 @@ module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  
             ) ? 1:0 ;
 
         end
+
+
+    initial life3 = 1 ;
+    initial life2 = 1 ;
+    initial life1 = 1 ;
+
+    always@(posedge hit)
+    begin   // end the game
+        if(life3 == 1)
+            begin
+                life3 <= 0 ;
+                hit <= 0 ;
+            end
+        else
+            if(life2 == 1)
+                begin
+                    life2 <= 0 ;
+                    hit <= 0;
+                end
+            else
+                if(life1 == 1)
+                    begin
+                        life1 <= 0 ;
+                        hit <= 0 ;
+                    end
+                else
+                    begin
+                        GameOver <= 1 ;
+                    end
+
+    end
+
 endmodule
 
 
@@ -440,7 +474,8 @@ endmodule // LFSR
 
 /* top module */
 `define padTime 10 
-module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1 , dot_row2, dot_col2 , life ) ;
+module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1
+         , dot_row2, dot_col2 , life1 , life2 , life3 ) ;
     
     /*device*/
     input clock , reset ;
@@ -448,12 +483,13 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
 	output reg [3:0] keypadRow ; 
     output[6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
     output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
+    output life1 , life2 , life3 ;
     wire [3:0] score_out1,score_out2,score_out3,score_out4; // connect to the ssd 
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
     reg [3:0] keypadBuf ;
 	reg [3:0] keypadDelay ;
     reg stop , start , restart , up , down ;
-
+    wire GameOver ;
     
     /*map*/
     wire[7:0] col1[7:0] ,  col2[7:0]  ; // Combine the mv_map and map_ld together , and send it to dot_col 
@@ -468,7 +504,6 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
     reg[1:0] gap ; // used to control the obstacle not too close to other obstacles
 
     /*other*/
-    output reg [2:0] life ; // the life of the dinosaur 
     wire hit ; // check if the little dinosaur was hit or not 
     wire score ;
     reg [2:0] row_count ;
@@ -492,7 +527,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
     // check whether it was hit or not 
     Hit m3 (unit_clk, record_obstacle[7] , record_obstacle[6],record_obstacle[5] , record_obstacle[4] , record_obstacle[3] , record_obstacle[2] ,
             record_obstacle[1] , record_obstacle[0] , map_ld[7] , map_ld[6] ,map_ld[5] , map_ld[4] ,map_ld[3] , map_ld[2] ,  map_ld[1],
-            map_ld[0] ,hit) ;
+            map_ld[0] , life3 , life2 , life1 , GameOver ) ;
 
     // the score is depends on game speed 
     Score m4 (unit_clk,reset,score_out1,score_out2,score_out3,score_out4);
