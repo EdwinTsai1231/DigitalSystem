@@ -92,91 +92,105 @@ module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 ,
     /* random number generator */
     LFSR #(.NUM_BITS(32)) dut( unit_clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
 
-    always@(posedge unit_clk)
+    always@(posedge unit_clk , posedge reset)
     begin
-        ran <= o_LFSR_Data % 8 ;
-        case(ran)
-        3'd 0 :begin
-            spawn_obstacle_0 <= 2'b 00 ;
-            spawn_obstacle_1 <= 2'b 00 ;
-            spawn_obstacle_2 <= 2'b 00 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 11 ;
-            spawn_obstacle_6 <= 2'b 11 ;
-            spawn_obstacle_7 <= 2'b 11 ; 
-        end
-        3'd 1 :begin
-            spawn_obstacle_0 <= 2'b 11 ;
-            spawn_obstacle_1 <= 2'b 11 ;
-            spawn_obstacle_2 <= 2'b 11 ;
-            spawn_obstacle_3 <= 2'b 11 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 00 ;
-            spawn_obstacle_6 <= 2'b 00 ;
-            spawn_obstacle_7 <= 2'b 00 ;  
-        end
-        3'd 2 :begin
-            spawn_obstacle_0 <= 2'b 11 ;
-            spawn_obstacle_1 <= 2'b 11 ;
-            spawn_obstacle_2 <= 2'b 00 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 00 ;
-            spawn_obstacle_6 <= 2'b 11 ;
-            spawn_obstacle_7 <= 2'b 11 ; 
-        end
-        3'd 3 :begin
-            spawn_obstacle_0 <= 2'b 00 ;
-            spawn_obstacle_1 <= 2'b 00 ;
-            spawn_obstacle_2 <= 2'b 00 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 11 ;
-            spawn_obstacle_6 <= 2'b 11 ;
-            spawn_obstacle_7 <= 2'b 11 ; 
-        end
-        3'd 4 :begin
-            spawn_obstacle_0 <= 2'b 11 ;
-            spawn_obstacle_1 <= 2'b 00 ;
-            spawn_obstacle_2 <= 2'b 00 ;
-            spawn_obstacle_3 <= 2'b 11 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 00 ;
-            spawn_obstacle_6 <= 2'b 00 ;
-            spawn_obstacle_7 <= 2'b 11 ; 
-        end
-        3'd 5 :begin
-            spawn_obstacle_0 <= 2'b 11 ;
-            spawn_obstacle_1 <= 2'b 11 ;
-            spawn_obstacle_2 <= 2'b 11 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 00 ;
-            spawn_obstacle_6 <= 2'b 00 ;
-            spawn_obstacle_7 <= 2'b 11 ; 
-        end
-        3'd 6 :begin
-            spawn_obstacle_0 <= 2'b 11 ;
-            spawn_obstacle_1 <= 2'b 11 ;
-            spawn_obstacle_2 <= 2'b 00 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 11 ;
-            spawn_obstacle_6 <= 2'b 00 ;
-            spawn_obstacle_7 <= 2'b 11 ;  
-        end
-        3'd 7 :begin
-            spawn_obstacle_0 <= 2'b 01 ;
-            spawn_obstacle_1 <= 2'b 01 ;
-            spawn_obstacle_2 <= 2'b 11 ;
-            spawn_obstacle_3 <= 2'b 00 ;
-            spawn_obstacle_4 <= 2'b 00 ;
-            spawn_obstacle_5 <= 2'b 11 ;
-            spawn_obstacle_6 <= 2'b 01 ;
-            spawn_obstacle_7 <= 2'b 01 ;  
-        end
-        endcase
+        if(reset==1)
+            begin
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 00 ;  
+            end
+        else
+            begin
+            ran <= o_LFSR_Data % 8 ;
+            case(ran)
+            3'd 0 :begin
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 11 ;
+                spawn_obstacle_6 <= 2'b 11 ;
+                spawn_obstacle_7 <= 2'b 11 ; 
+            end
+            3'd 1 :begin
+                spawn_obstacle_0 <= 2'b 11 ;
+                spawn_obstacle_1 <= 2'b 11 ;
+                spawn_obstacle_2 <= 2'b 11 ;
+                spawn_obstacle_3 <= 2'b 11 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 00 ;  
+            end
+            3'd 2 :begin
+                spawn_obstacle_0 <= 2'b 11 ;
+                spawn_obstacle_1 <= 2'b 11 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 11 ;
+                spawn_obstacle_7 <= 2'b 11 ; 
+            end
+            3'd 3 :begin
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 11 ;
+                spawn_obstacle_6 <= 2'b 11 ;
+                spawn_obstacle_7 <= 2'b 11 ; 
+            end
+            3'd 4 :begin
+                spawn_obstacle_0 <= 2'b 11 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 11 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 11 ; 
+            end
+            3'd 5 :begin
+                spawn_obstacle_0 <= 2'b 11 ;
+                spawn_obstacle_1 <= 2'b 11 ;
+                spawn_obstacle_2 <= 2'b 11 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 11 ; 
+            end
+            3'd 6 :begin
+                spawn_obstacle_0 <= 2'b 11 ;
+                spawn_obstacle_1 <= 2'b 11 ;
+                spawn_obstacle_2 <= 2'b 00 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 11 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 11 ;  
+            end
+            3'd 7 :begin
+                spawn_obstacle_0 <= 2'b 01 ;
+                spawn_obstacle_1 <= 2'b 01 ;
+                spawn_obstacle_2 <= 2'b 11 ;
+                spawn_obstacle_3 <= 2'b 00 ;
+                spawn_obstacle_4 <= 2'b 00 ;
+                spawn_obstacle_5 <= 2'b 11 ;
+                spawn_obstacle_6 <= 2'b 01 ;
+                spawn_obstacle_7 <= 2'b 01 ;  
+            end
+            endcase
+            end
     end
 endmodule
 
@@ -470,7 +484,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
     // the score is depends on game speed 
     Score m4 (unit_clk,reset,score_out1,score_out2,score_out3,score_out4);
     
-    // Combine the map 
+    /* Merge the map */
     assign temp[0] = mv_map[0][0] ;
     assign col1[0] = {(temp[0][7:4] | map_ld[0]) , temp[0][3:0]}  ; 
     assign col2[0] = mv_map[0][1] ;
@@ -502,13 +516,36 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
     assign temp[7] = mv_map[7][0] ;
     assign col1[7] = {(temp[7][7:4] | map_ld[7]) , temp[7][3:0]}  ; 
     assign col2[7] = mv_map[7][1] ;
+    /* Merge the map */
 
-    // refresh the map
+    /* Refresh the map */
     always@(posedge unit_clk , negedge reset )
     begin
         if(!reset)
             begin
-                //initialization
+                mv_map[0][0] = 8'd 0000_0000;
+                mv_map[0][1] = 8'd 0000_0000;
+
+                mv_map[1][0] = 8'd 0000_0000;
+                mv_map[1][1] = 8'd 0000_0000;
+
+                mv_map[2][0] = 8'd 0000_0000;
+                mv_map[2][1] = 8'd 0000_0000;
+
+                mv_map[3][0] = 8'd 0000_0000;
+                mv_map[3][1] = 8'd 0000_0000;
+
+                mv_map[4][0] = 8'd 0000_0000;
+                mv_map[4][1] = 8'd 0000_0000;
+
+                mv_map[5][0] = 8'd 0000_0000;
+                mv_map[5][1] = 8'd 0000_0000;
+
+                mv_map[6][0] = 8'd 0000_0000;
+                mv_map[6][1] = 8'd 0000_0000;
+
+                mv_map[7][0] = 8'd 0000_0000;
+                mv_map[7][1] = 8'd 0000_0000;
             end
         else
                 begin
@@ -600,9 +637,10 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                     endcase
                 end
         end
-    
+    /* Refresh the map */
+   
+   /* Moving the map */ 
     integer i ;
-    // control the moving map 
     always@(posedge unit_clk , posedge stop)
     begin
         if(stop == 0)
@@ -640,7 +678,9 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                     {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} ;
                 end
     end
+    /* Moving the map */
 
+    /* Detect the keypad  */
     always@(posedge unit_clk)
 	begin
 		if(!reset)
@@ -702,6 +742,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                 stop = 0 ;
                 restart = 0 ;
             end
+
             4'h e :begin
                 down = 0 ;
                 up = 0 ;
@@ -709,6 +750,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                 stop = 1 ;
                 restart = 0 ;
             end
+
             4'h f :begin
                 down = 0 ;
                 up = 0 ;
@@ -716,7 +758,16 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                 stop = 0 ;
                 restart = 1 ;
             end
+
+            default :begin 
+                down = down ;
+                up = up ;
+                start = start ;
+                restart = restart ;
+            end
+
         endcase
     end
+    /* Detect the keypad*/
 
 endmodule
