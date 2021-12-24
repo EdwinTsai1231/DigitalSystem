@@ -252,31 +252,6 @@ module Hit ( unit_clk,record_obstacle_7 , record_obstacle_6 ,record_obstacle_5  
     initial life2 = 1 ;
     initial life1 = 1 ;
 
-    always@(posedge hit)
-    begin   // end the game
-        if(life3 == 1)
-            begin
-                life3 <= 0 ;
-                hit <= 0 ;
-            end
-        else
-            if(life2 == 1)
-                begin
-                    life2 <= 0 ;
-                    hit <= 0;
-                end
-            else
-                if(life1 == 1)
-                    begin
-                        life1 <= 0 ;
-                        hit <= 0 ;
-                    end
-                else
-                    begin
-                        GameOver <= 1 ;
-                    end
-
-    end
 
 endmodule
 
@@ -571,29 +546,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
     begin
         if(!reset)
             begin
-                mv_map[0][0] = 8'd 0000_0000;
-                mv_map[0][1] = 8'd 0000_0000;
 
-                mv_map[1][0] = 8'd 0000_0000;
-                mv_map[1][1] = 8'd 0000_0000;
-
-                mv_map[2][0] = 8'd 0000_0000;
-                mv_map[2][1] = 8'd 0000_0000;
-
-                mv_map[3][0] = 8'd 0000_0000;
-                mv_map[3][1] = 8'd 0000_0000;
-
-                mv_map[4][0] = 8'd 0000_0000;
-                mv_map[4][1] = 8'd 0000_0000;
-
-                mv_map[5][0] = 8'd 0000_0000;
-                mv_map[5][1] = 8'd 0000_0000;
-
-                mv_map[6][0] = 8'd 0000_0000;
-                mv_map[6][1] = 8'd 0000_0000;
-
-                mv_map[7][0] = 8'd 0000_0000;
-                mv_map[7][1] = 8'd 0000_0000;
             end
         else
                 begin
@@ -689,7 +642,7 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
    
    /* Moving the map */ 
     integer i ;
-    always@(posedge unit_clk , posedge stop)
+    always@(posedge unit_clk )
     begin
         if(stop == 0)
             begin
