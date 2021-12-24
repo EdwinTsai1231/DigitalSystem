@@ -58,12 +58,25 @@ endmodule
 
 
 /* not complete yet */
-module LD_state(spd_ldi , up , down , map_ld , state) ; // output a state
-    input spd_ldi ;
+module LD_state( up , down , map_ld_0 , map_ld_1 , map_ld_2  , map_ld_3  , map_ld_4  , map_ld_5  , map_ld_6  , map_ld_7  ) ; // output a state
     input up , down ;
-    output [3:0] map_ld ; 
-    output [3:0] state ;
+    output [3:0] map_ld_0  ,  map_ld_1  ,  map_ld_2  ,  map_ld_3  ,  map_ld_4  ,  map_ld_5  , map_ld_6  ,  map_ld_7   ;
 
+    //test 
+    assign map_ld_0 = 4'b 0000;
+    assign map_ld_1 = 4'b 0000;
+    assign map_ld_2 = 4'b 0000;
+    assign map_ld_3 = 4'b 0000;
+    assign map_ld_4 = 4'b 0111;
+    assign map_ld_5 = 4'b 0100;
+    assign map_ld_6 = 4'b 0110;
+    assign map_ld_7 = 4'b 1100;
+
+    always@(posedge up , posedge down )
+    begin
+
+
+    end
 endmodule
 
 
@@ -456,7 +469,6 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
 
     /*other*/
     output reg [2:0] life ; // the life of the dinosaur 
-    wire[3:0] state ; // the state number of the little dinosaur 
     wire hit ; // check if the little dinosaur was hit or not 
     wire score ;
     reg [2:0] row_count ;
@@ -470,7 +482,8 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
 
 
     Unit_fd f2 (.clk_in(clock) , .reset(reset) , .clk_out(unit_clk)) ; // frequency divider 
-    // LD_state m1 (.state(state)) ;
+
+    LD_state m1 ( up , down , map_ld[0], map_ld[1], map_ld[2],  map_ld[3],  map_ld[4],  map_ld[5],  map_ld[6],  map_ld[7] ) ;
 
     // create a new obstacle
     Obstacle m2 (unit_clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
