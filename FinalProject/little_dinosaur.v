@@ -96,14 +96,16 @@ module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 ,
     output reg [1:0] spawn_obstacle_1 ;
     output reg [1:0] spawn_obstacle_0 ;
     reg[2:0] ran ;
+    /*
     wire[31:0] random ;
     reg i_Seed_DV;
 	reg [31:0] i_Seed_Data;
 	wire [31:0] o_LFSR_Data;
 	wire o_LFSR_Done;
+    */
 
     /* random number generator */
-    LFSR #(.NUM_BITS(32)) dut( unit_clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
+    //LFSR #(.NUM_BITS(32)) dut( unit_clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
 
     always@(posedge unit_clk , posedge reset)
     begin
@@ -120,7 +122,7 @@ module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 ,
             end
         else
             begin
-            ran <= o_LFSR_Data % 8 ;
+            ran <= ran+1 ;
             case(ran)
             3'd 0 :begin
                 spawn_obstacle_0 <= 2'b 00 ;
@@ -449,15 +451,15 @@ endmodule // LFSR
 
 /* top module */
 `define padTime 10 
-module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row1 , dot_col1
-         , dot_row2, dot_col2 , life1 , life2 , life3 ) ;
+module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 , dot_row , dot_col1
+         , dot_col2 , life1 , life2 , life3 ) ;
     
     /*device*/
     input clock , reset ;
     input [3:0] keypadCol ;	
 	output reg [3:0] keypadRow ; 
     output[6:0] ssd_out1 , ssd_out2 , ssd_out3 , ssd_out4 ; // Seven Segments Display
-    output reg [7:0] dot_row1 , dot_col1 , dot_row2 , dot_col2 ; // show the picture in the dot matrix
+    output reg [7:0] dot_row , dot_col1 , dot_col2 ; // show the picture in the dot matrix
     output life1 , life2 , life3 ;
     wire [3:0] score_out1,score_out2,score_out3,score_out4; // connect to the ssd 
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
@@ -553,45 +555,21 @@ module little_dinosaur(clock , reset , keypadCol , keypadRow , ssd_out1 , ssd_ou
                     row_count <= row_count+1 ;
                     case(row_count)
                     3'd 0 :
-                    begin
-                        dot_row1 <= 8'b 01111111 ;
-                        dot_row2 <= 8'b 01111111 ;
-                    end
+                        dot_row <= 8'b 01111111 ;
                     3'd 1 :
-                    begin
-                        dot_row1 <= 8'b 10111111 ;
-                        dot_row2 <= 8'b 10111111 ;
-                    end
+                        dot_row <= 8'b 10111111 ;
                     3'd 2 :
-                    begin
-                        dot_row1 <= 8'b 11011111 ;
-                        dot_row2 <= 8'b 11011111 ;
-                    end
+                        dot_row <= 8'b 11011111 ;
                     3'd 3 :
-                    begin
-                        dot_row1 <= 8'b 11101111 ;
-                        dot_row2 <= 8'b 11101111 ;
-                    end
+                        dot_row <= 8'b 11101111 ;
                     3'd 4 :
-                    begin
-                        dot_row1 <= 8'b 11110111 ;
-                        dot_row2 <= 8'b 11110111 ;
-                    end
+                        dot_row <= 8'b 11110111 ;
                     3'd 5 :
-                    begin
-                        dot_row1 <= 8'b 11111011 ;
-                        dot_row2 <= 8'b 11111011 ;
-                    end
+                        dot_row <= 8'b 11111011 ;
                     3'd 6 :
-                    begin
-                        dot_row1 <= 8'b 11111101 ;
-                        dot_row2 <= 8'b 11111101 ;
-                    end
+                        dot_row <= 8'b 11111101 ;
                     3'd 7 :
-                    begin
-                        dot_row1 <= 8'b 11111110 ;
-                        dot_row2 <= 8'b 11111110 ;
-                    end
+                        dot_row <= 8'b 11111110 ;
                 endcase
 
                 case(row_count)
