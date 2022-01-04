@@ -139,41 +139,41 @@ module Obstacle (clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spaw
                 spawn_obstacle_0 <= 2'b 11 ;
                 spawn_obstacle_1 <= 2'b 00 ;
                 spawn_obstacle_2 <= 2'b 00 ;
-                spawn_obstacle_3 <= 2'b 11 ;
+                spawn_obstacle_3 <= 2'b 00 ;
                 spawn_obstacle_4 <= 2'b 00 ;
                 spawn_obstacle_5 <= 2'b 00 ;
                 spawn_obstacle_6 <= 2'b 00 ;
                 spawn_obstacle_7 <= 2'b 11 ;
             end
             3'd 5 :begin
-                spawn_obstacle_0 <= 2'b 11 ;
-                spawn_obstacle_1 <= 2'b 11 ;
-                spawn_obstacle_2 <= 2'b 11 ;
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
                 spawn_obstacle_3 <= 2'b 00 ;
                 spawn_obstacle_4 <= 2'b 00 ;
                 spawn_obstacle_5 <= 2'b 00 ;
                 spawn_obstacle_6 <= 2'b 00 ;
-                spawn_obstacle_7 <= 2'b 11 ;
+                spawn_obstacle_7 <= 2'b 00 ;
             end
             3'd 6 :begin
-                spawn_obstacle_0 <= 2'b 11 ;
-                spawn_obstacle_1 <= 2'b 11 ;
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
                 spawn_obstacle_2 <= 2'b 00 ;
                 spawn_obstacle_3 <= 2'b 00 ;
                 spawn_obstacle_4 <= 2'b 00 ;
-                spawn_obstacle_5 <= 2'b 11 ;
+                spawn_obstacle_5 <= 2'b 00 ;
                 spawn_obstacle_6 <= 2'b 00 ;
-                spawn_obstacle_7 <= 2'b 11 ;
+                spawn_obstacle_7 <= 2'b 00 ;
             end
             3'd 7 :begin
-                spawn_obstacle_0 <= 2'b 01 ;
-                spawn_obstacle_1 <= 2'b 01 ;
-                spawn_obstacle_2 <= 2'b 11 ;
+                spawn_obstacle_0 <= 2'b 00 ;
+                spawn_obstacle_1 <= 2'b 00 ;
+                spawn_obstacle_2 <= 2'b 00 ;
                 spawn_obstacle_3 <= 2'b 00 ;
                 spawn_obstacle_4 <= 2'b 00 ;
-                spawn_obstacle_5 <= 2'b 11 ;
-                spawn_obstacle_6 <= 2'b 01 ;
-                spawn_obstacle_7 <= 2'b 01 ;
+                spawn_obstacle_5 <= 2'b 00 ;
+                spawn_obstacle_6 <= 2'b 00 ;
+                spawn_obstacle_7 <= 2'b 00 ;
             end
         endcase
         end
