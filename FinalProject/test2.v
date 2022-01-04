@@ -54,10 +54,10 @@ module fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     end
 endmodule
 
-module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
+module Obstacle (clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
 
-    input unit_clk ;
+    input clk ;
     input reset ;
     input [1:0] gap ;
     output reg [1:0] spawn_obstacle_7 ;
@@ -68,16 +68,18 @@ module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 ,
     output reg [1:0] spawn_obstacle_2 ;
     output reg [1:0] spawn_obstacle_1 ;
     output reg [1:0] spawn_obstacle_0 ;
-    reg[2:0] ran ;
+    wire[2:0] ran ;
     wire[31:0] random ;
     reg i_Seed_DV;
 	reg [31:0] i_Seed_Data;
 	wire [31:0] o_LFSR_Data;
 	wire o_LFSR_Done;
 
-    LFSR #(.NUM_BITS(32)) dut( unit_clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
+    LFSR #(.NUM_BITS(32)) dut( clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
+    assign ran = o_LFSR_Data [1:0] ;
 
-    always@(posedge unit_clk , negedge reset)
+
+    always@(posedge clk , negedge reset)
     begin
         if(!reset)
             begin
@@ -336,7 +338,7 @@ module obstacle(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
     fd f3 (.clk_in(clock) , .reset(reset) , .clk_out(clk)) ; // frequency divider 
 
     // create a new obstacle
-    Obstacle m2 (unit_clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
+    Obstacle m2 (clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
     ,spawn_obstacle[2] , spawn_obstacle[1] , spawn_obstacle[0] ) ;
 
     /* Merge the map */
