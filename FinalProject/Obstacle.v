@@ -26,6 +26,34 @@ module Unit_fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     end
 endmodule
 
+`define Time 32'd 25000000
+module fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
+    input clk_in,reset ;
+    output reg clk_out ;
+    reg [31:0] count ;
+
+    always@(posedge clk_in)
+    begin
+        if(!reset)
+            begin
+                count<=32'd 0 ;
+                clk_out <= 1'b 0;
+            end
+        else
+            begin
+                if(count==`Time)
+                    begin
+                        count <= 0;
+                        clk_out <= ~clk_out;
+                    end
+                else
+                    begin
+                        count = count+1 ;//Is the notation between count and count+1 '=' or '<='?
+                    end
+            end
+    end
+endmodule
+
 module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spawn_obstacle_5 , spawn_obstacle_4 , spawn_obstacle_3
     ,spawn_obstacle_2 , spawn_obstacle_1 , spawn_obstacle_0 ) ;
 
@@ -42,9 +70,9 @@ module Obstacle (unit_clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 ,
     output reg [1:0] spawn_obstacle_0 ;
     reg[2:0] ran ;
 
-    always@(posedge unit_clk , posedge reset)
+    always@(posedge unit_clk , negedge reset)
     begin
-        if(reset==1)
+        if(!reset)
             begin
                 spawn_obstacle_0 <= 2'b 00 ;
                 spawn_obstacle_1 <= 2'b 00 ;
@@ -75,7 +103,8 @@ module little_dinosaur(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
     input clock , reset ;
     output reg [7:0] dot_row , dot_col1 , dot_col2 ; // show the picture in the dot matrix
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
-    
+    wire clk ;
+
     /*map*/
     wire[7:0] col1[7:0] ,  col2[7:0]  ; // Combine the mv_map and map_ld together , and send it to dot_col 
     reg[7:0] mv_map[7:0][1:0] ; // the map only need to record the column  
@@ -94,6 +123,8 @@ module little_dinosaur(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
     reg [2:0] row_count ;
 
     Unit_fd f2 (.clk_in(clock) , .reset(reset) , .clk_out(unit_clk)) ; // frequency divider 
+
+    fd f3 (.clk_in(clock) , .reset(reset) , .clk_out(clk)) ; // frequency divider 
 
     // create a new obstacle
     Obstacle m2 (unit_clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
@@ -209,29 +240,58 @@ module little_dinosaur(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
     /* Refresh the map */
    
    /* Moving the map */ 
-    integer i ;
-    always@(posedge unit_clk )
+    always@(posedge clk )
     begin
         if(gap == 2'd 3) // prodice the obstacle
             begin
                 gap <= 2'd 0 ;
-                for(i=0 ; i< 8  ; i = i+1 ) 
-                    begin
-                        obstacle[i] <= spawn_obstacle[i] ;
-                        record_obstacle[i][1:0] <= spawn_obstacle[i] ; // the obstacle map 
-                    end
+ 
+                obstacle[0] <= spawn_obstacle[0] ;
+                record_obstacle[0][1:0] <= spawn_obstacle[0] ; // the obstacle map 
+
+                obstacle[1] <= spawn_obstacle[1] ;
+                record_obstacle[1][1:0] <= spawn_obstacle[1] ; // the obstacle map 
+
+                obstacle[2] <= spawn_obstacle[2] ;
+                record_obstacle[2][1:0] <= spawn_obstacle[2] ; // the obstacle map 
+
+                obstacle[3] <= spawn_obstacle[3] ;
+                record_obstacle[3][1:0] <= spawn_obstacle[3] ; // the obstacle map 
+
+                obstacle[4] <= spawn_obstacle[4] ;
+                record_obstacle[4][1:0] <= spawn_obstacle[4] ; // the obstacle map 
+
+                obstacle[5] <= spawn_obstacle[5] ;
+                record_obstacle[5][1:0] <= spawn_obstacle[5] ; // the obstacle map 
+
+                obstacle[6] <= spawn_obstacle[6] ;
+                record_obstacle[6][1:0] <= spawn_obstacle[6] ; // the obstacle map 
+                
+                obstacle[7] <= spawn_obstacle[7] ;
+                record_obstacle[7][1:0] <= spawn_obstacle[7] ; // the obstacle map 
+
             end
         else
             begin
-                        record_obstacle[i] <= record_obstacle[i] << 1 ; // the obstacle map 
-                        gap <= gap+1 ;
+                record_obstacle[0] <= record_obstacle[0] << 1 ; // the obstacle map 
+                record_obstacle[1] <= record_obstacle[1] << 1 ; // the obstacle map 
+                record_obstacle[2] <= record_obstacle[2] << 1 ; // the obstacle map 
+                record_obstacle[3] <= record_obstacle[3] << 1 ; // the obstacle map 
+                record_obstacle[4] <= record_obstacle[4] << 1 ; // the obstacle map 
+                record_obstacle[5] <= record_obstacle[5] << 1 ; // the obstacle map 
+                record_obstacle[6] <= record_obstacle[6] << 1 ; // the obstacle map 
+                record_obstacle[7] <= record_obstacle[7] << 1 ; // the obstacle map 
 
-                
-                // outside the if-else condition 
-                for(i = 0 ; i < 8 ; i = i+1 )
-                    begin
-                        {mv_map[i][0],mv_map[i][1],obstacle[i]} <= {mv_map[i][0],mv_map[i][1],obstacle[i]} << 1 ;
-                    end
+                gap <= gap+1 ;
+
+                {mv_map[0][0],mv_map[0][1],obstacle[0]} <= {mv_map[0][0],mv_map[0][1],obstacle[0]} << 1 ;
+                {mv_map[1][0],mv_map[1][1],obstacle[1]} <= {mv_map[1][0],mv_map[1][1],obstacle[1]} << 1 ;
+                {mv_map[2][0],mv_map[2][1],obstacle[2]} <= {mv_map[2][0],mv_map[2][1],obstacle[2]} << 1 ;
+                {mv_map[3][0],mv_map[3][1],obstacle[3]} <= {mv_map[3][0],mv_map[3][1],obstacle[3]} << 1 ;
+                {mv_map[4][0],mv_map[4][1],obstacle[4]} <= {mv_map[4][0],mv_map[4][1],obstacle[4]} << 1 ;
+                {mv_map[5][0],mv_map[5][1],obstacle[5]} <= {mv_map[5][0],mv_map[5][1],obstacle[5]} << 1 ;
+                {mv_map[6][0],mv_map[6][1],obstacle[6]} <= {mv_map[6][0],mv_map[6][1],obstacle[6]} << 1 ;
+                {mv_map[7][0],mv_map[7][1],obstacle[7]} <= {mv_map[7][0],mv_map[7][1],obstacle[7]} << 1 ;
             end
 
     end
