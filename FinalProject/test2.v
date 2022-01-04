@@ -76,7 +76,7 @@ module Obstacle (clk  , reset , gap , spawn_obstacle_7 , spawn_obstacle_6 , spaw
 	wire o_LFSR_Done;
 
     LFSR #(.NUM_BITS(32)) dut( clk , reset, i_Seed_DV , i_Seed_Data , o_LFSR_Data , o_LFSR_Done );
-    assign ran = o_LFSR_Data [1:0] ;
+    assign ran = o_LFSR_Data [2:0] ;
 
 
     always@(posedge clk , negedge reset)
