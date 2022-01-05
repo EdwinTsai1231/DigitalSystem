@@ -26,7 +26,35 @@ module Unit_fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     end
 endmodule
 
-`define Time 32'd 25000000
+`define Time2 32'd 3125000
+module fd2(clk_in ,reset, clk_out) ; // Time Frequency Divider
+    input clk_in,reset ;
+    output reg clk_out ;
+    reg [31:0] count ;
+
+    always@(posedge clk_in)
+    begin
+        if(!reset)
+            begin
+                count<=32'd 0 ;
+                clk_out <= 1'b 0;
+            end
+        else
+            begin
+                if(count==`Time2)
+                    begin
+                        count <= 0;
+                        clk_out <= ~clk_out;
+                    end
+                else
+                    begin
+                        count = count+1 ;//Is the notation between count and count+1 '=' or '<='?
+                    end
+            end
+    end
+endmodule
+
+`define Time 32'd 2500000
 module fd(clk_in ,reset, clk_out) ; // Time Frequency Divider
     input clk_in,reset ;
     output reg clk_out ;
@@ -308,35 +336,222 @@ module LFSR #(parameter NUM_BITS = 32)(
 
 endmodule // LFSR
 
-module LD_state( up , down , map_ld_0 , map_ld_1 , map_ld_2  , map_ld_3  , map_ld_4  , map_ld_5  , map_ld_6  , map_ld_7  ) ; // output a state
-    input up , down ;
+module LD_state( up , down , map_ld_0 , map_ld_1 , map_ld_2  , map_ld_3  , map_ld_4  , map_ld_5  , map_ld_6  , map_ld_7 , eight_one_clk ) ; // output a state
+    input up , down , eight_one_clk ;		//跳處理:1/8秒改變
     output reg [3:0] map_ld_0  ,  map_ld_1  ,  map_ld_2  ,  map_ld_3  ,  map_ld_4  ,  map_ld_5  , map_ld_6  ,  map_ld_7   ;
-	 reg jump_or_not = 0 , down_or_not = 0 ;					//是不是在跳 , 是不是在蹲
-	 reg eight_one_clk ;					//跳處理:1/8秒改變
+	 reg jump_or_not = 0 ;					//是不是在跳 , 是不是在蹲
 	 reg [3:0] count = 4'd0 ;			//count : 跳狀態為何
-
-	 always@(posedge down or posedge up or posedge eight_one_clk)					//蹲
+	 wire alw_true = 1 ;
+	 
+	
+	 always @ (posedge eight_one_clk)					//蹲
 	 //-----------------------------------------------------給予判斷值
+begin
+if(up || down || alw_true == 1)
 	 begin
+		if(jump_or_not == 0)					//沒有在跳
+		begin
+			if(up)								//按下up => 跳吧!
+			
+			begin
+				jump_or_not <= 1 ;
+				count <= count + 4'd1 ;
+				if(down)						//要跳 && 要蹲
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0000 ;
+						map_ld_4 <= 4'b0000 ;
+						map_ld_5 <= 4'b1111 ;
+						map_ld_6 <= 4'b0101 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+				else							//要跳 && 不蹲
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0111 ;
+						map_ld_4 <= 4'b0100 ;
+						map_ld_5 <= 4'b0110 ;
+						map_ld_6 <= 4'b1100 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+			end
+			
+			else 									//沒按up => 不跳!
+			
+			begin
+				if(down)							//沒跳 && 蹲
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0000 ;
+						map_ld_4 <= 4'b0000 ;
+						map_ld_5 <= 4'b0000 ;
+						map_ld_6 <= 4'b1111 ;
+						map_ld_7 <= 4'b0101 ;
+					end
+				else
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0000 ;
+						map_ld_4 <= 4'b0111 ;
+						map_ld_5 <= 4'b0100 ;
+						map_ld_6 <= 4'b0110 ;
+						map_ld_7 <= 4'b1100 ;
+					end
+			end
+			
+		end
+		else 									//正在跳
+		begin
+			count <= count + 4'd1 ;				//下一個狀態
+			
+			if(count == 4'd9)
+				begin
+					count <= 0 ;
+					jump_or_not <= 0 ;
+				end
+			else
+				begin
+				end
+			
+		
+			if(down)							//跳 && 蹲
+			
+			begin
+				case (count)
+				4'd1 , 4'd8 :
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0000 ;
+						map_ld_4 <= 4'b0000 ;
+						map_ld_5 <= 4'b1111 ;
+						map_ld_6 <= 4'b0101 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+				4'd2 , 4'd7 :
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b0000 ;
+						map_ld_4 <= 4'b1111 ;
+						map_ld_5 <= 4'b0101 ;
+						map_ld_6 <= 4'b0000 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+				4'd3 , 4'd6 :
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b0000 ;
+						map_ld_3 <= 4'b1111 ;
+						map_ld_4 <= 4'b0101 ;
+						map_ld_5 <= 4'b0000 ;							
+						map_ld_6 <= 4'b0000 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+				4'd4 , 4'd5 :
+					begin
+						map_ld_0 <= 4'b0000 ;
+						map_ld_1 <= 4'b0000 ;
+						map_ld_2 <= 4'b1111 ;
+						map_ld_3 <= 4'b0101 ;
+						map_ld_4 <= 4'b0000 ;
+						map_ld_5 <= 4'b0000 ;
+						map_ld_6 <= 4'b0000 ;
+						map_ld_7 <= 4'b0000 ;
+					end
+				endcase
+			end
+			
+			else								//跳 && 不蹲
+			
+				begin
+				case (count)
+					4'd1 , 4'd8 :
+						begin
 							map_ld_0 <= 4'b0000 ;
 							map_ld_1 <= 4'b0000 ;
 							map_ld_2 <= 4'b0000 ;
-							map_ld_3 <= 4'b0000 ;
-							map_ld_4 <= 4'b0111 ;
-							map_ld_5 <= 4'b0100 ;
-							map_ld_6 <= 4'b0110 ;
-							map_ld_7 <= 4'b1100 ;
-    end
+							map_ld_3 <= 4'b0111 ;
+							map_ld_4 <= 4'b0100 ;
+							map_ld_5 <= 4'b0110 ;
+							map_ld_6 <= 4'b1100 ;
+							map_ld_7 <= 4'b0000 ;
+						end
+					4'd2 , 4'd7 :
+						begin
+							map_ld_0 <= 4'b0000 ;
+							map_ld_1 <= 4'b0000 ;
+							map_ld_2 <= 4'b0111 ;
+							map_ld_3 <= 4'b0100 ;
+							map_ld_4 <= 4'b0110 ;
+							map_ld_5 <= 4'b1100 ;
+							map_ld_6 <= 4'b0000 ;
+							map_ld_7 <= 4'b0000 ;
+						end
+					4'd3 , 4'd6 :
+						begin
+							map_ld_0 <= 4'b0000 ;
+							map_ld_1 <= 4'b0111 ;
+							map_ld_2 <= 4'b0100 ;
+							map_ld_3 <= 4'b0110 ;
+							map_ld_4 <= 4'b1100 ;
+							map_ld_5 <= 4'b0000 ;
+							map_ld_6 <= 4'b0000 ;
+							map_ld_7 <= 4'b0000 ;
+						end
+					4'd4 , 4'd5 :
+						begin
+							map_ld_0 <= 4'b0111 ;
+							map_ld_1 <= 4'b0100 ;
+							map_ld_2 <= 4'b0110 ;
+							map_ld_3 <= 4'b1100 ;
+							map_ld_4 <= 4'b0000 ;
+							map_ld_5 <= 4'b0000 ;
+							map_ld_6 <= 4'b0000 ;
+							map_ld_7 <= 4'b0000 ;
+						end
+				endcase
+				end
+			
+		end			//129行的
+	end				//67行的
+	
+else 
+	begin
+		
+	end
+	
+end					//always的end
 endmodule
 
-module obstacle(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
+`define padTime 10 
+module obstacle(clock , keypadCol , keypadRow , reset , dot_row , dot_col1 , dot_col2 ) ;
     
     /*device*/
     input clock , reset ;
     output reg [7:0] dot_row , dot_col1 , dot_col2 ; // show the picture in the dot matrix
     wire unit_clk ; // unit_clk represents the time to refresh the dot matrix   
-    wire clk , up , down ;
+    wire clk ;
+    wire eight_one_clk ;
 
+    input [3:0] keypadCol ;
+	output reg [3:0] keypadRow ;
+
+    reg [3:0] keypadBuf ;
+	reg [3:0] keypadDelay ;
+    reg stop , start , restart , up , down ;
+    
     /*map*/
     wire[7:0] col1[7:0] ,  col2[7:0]  ; // Combine the mv_map and map_ld together , and send it to dot_col 
     reg[7:0] mv_map[7:0][1:0] ; // the map only need to record the column  
@@ -358,7 +573,9 @@ module obstacle(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
 
     fd f3 (.clk_in(clock) , .reset(reset) , .clk_out(clk)) ; // frequency divider 
 
-    LD_state m1 ( up , down , map_ld[0], map_ld[1], map_ld[2],  map_ld[3],  map_ld[4],  map_ld[5],  map_ld[6],  map_ld[7] ) ;
+    fd2 f4 (.clk_in(clock) , .reset(reset) , .clk_out(eight_one_clk)) ; // frequency divider 
+
+    LD_state m1 ( up , down , map_ld[0], map_ld[1], map_ld[2],  map_ld[3],  map_ld[4],  map_ld[5],  map_ld[6],  map_ld[7] , eight_one_clk) ;
 
     // create a new obstacle
     Obstacle m2 (clk , reset , gap , spawn_obstacle[7] , spawn_obstacle[6] , spawn_obstacle[5] , spawn_obstacle[4] , spawn_obstacle[3]
@@ -531,6 +748,96 @@ module obstacle(clock , reset , dot_row , dot_col1 , dot_col2 ) ;
 
     end
     /* Moving the map */
+
+     /* Detect the keypad  */
+    always@(posedge unit_clk)
+	begin
+		if(!reset)
+		begin
+			keypadRow <= 4'b 1110 ;
+			keypadBuf <= 4'b 0000 ;
+			keypadDelay <= 4'd 0 ;
+		end
+		else
+		begin
+			if(keypadDelay == `padTime)
+			begin
+				keypadDelay <= 31'd 0 ;
+				case({keypadRow, keypadCol})
+					8'b1110_1011 : keypadBuf <= 4'h1; // down
+					8'b1101_1011 : keypadBuf <= 4'h2; // up
+					8'b0111_1101 : keypadBuf <= 4'hd; // start
+					8'b0111_1011 : keypadBuf <= 4'he; // stop
+					8'b0111_0111 : keypadBuf <= 4'hf; // restart
+					default : keypadBuf <= keypadBuf;
+				endcase
+
+				case(keypadRow)
+					4'b1110 : keypadRow <= 4'b1101;
+					4'b1101 : keypadRow <= 4'b1011;
+					4'b1011 : keypadRow <= 4'b0111;
+					4'b0111 : keypadRow <= 4'b1110;
+					default : keypadRow <= 4'b1110;
+				endcase
+			end
+		else
+			keypadDelay <= keypadDelay + 1'd 1 ;
+		end
+	end
+
+    always@(keypadBuf)
+    begin
+        case(keypadBuf)
+            4'h 1 :begin
+                down = 1 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+
+            4'h 2 :begin
+                down = 0 ;
+                up = 1 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+
+            4'h d :begin
+                down = 0 ;
+                up = 0 ;
+                start = 1 ;
+                stop = 0 ;
+                restart = 0 ;
+            end
+
+            4'h e :begin
+                down = 0 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 1 ;
+                restart = 0 ;
+            end
+
+            4'h f :begin
+                down = 0 ;
+                up = 0 ;
+                start = 0 ;
+                stop = 0 ;
+                restart = 1 ;
+            end
+
+            default :begin
+                down = down ;
+                up = up ;
+                start = start ;
+                restart = restart ;
+            end
+
+        endcase
+    end
+    /* Detect the keypad*/
 
 endmodule
 
